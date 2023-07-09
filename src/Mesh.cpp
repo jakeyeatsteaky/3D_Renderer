@@ -1,11 +1,19 @@
 #include "Mesh.h"
+#include "RendererAPI.h"
 #include "VertexBuffer.h"
 #include "VertexLayout.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
+#include <fstream>
 
 Mesh::Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTexture, bool diff):
+	m_modelMatrix(glm::mat4(1.0)),
+	m_viewMatrix(glm::mat4(1.0)),
+	m_projMatrix(glm::mat4(1.0)),
 	m_shaderProgram(shaderProgram),
-	m_meshTexture(meshTexture),
-	m_modelMatrix(glm::mat4(1.0))
+	m_meshTexture(meshTexture)
 {
 	float vertices[] = {
 		 0.5f,  0.5f, 0.0f,
@@ -13,6 +21,8 @@ Mesh::Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTextu
 		-0.5f, -0.5f, 0.0f,
 		-0.5f,  0.5f, 0.0f
 	};
+
+	int ARRAY_SIZE = 12;
 
 	unsigned int indices[] = { 
 		0, 1, 3,  
@@ -32,12 +42,6 @@ Mesh::Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTextu
 		0.0f, 1.0f,
 		0.0f, 0.0f
 	};
-
-	if(diff)
-	{
-		vertices[0] = 1.0f;
-		vertices[1] = 1.0f;
-	}
 
 	VertexLayout attributeLayout_3(3);
 
@@ -97,11 +101,20 @@ void Mesh::Render()
 	Draw();
 }
 
-void Mesh::Update()
+void Mesh::Update(float time)
 {
-	SetUniforms("model");
-	SetUniforms("view");
-	SetUniforms("projection");
+	m_modelMatrix = glm::mat4(1.0f);
+	m_viewMatrix = glm::mat4(1.0f);
+	m_projMatrix = glm::mat4(1.0f);
+
+	m_modelMatrix = glm::rotate(m_modelMatrix, time * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); 
+	m_viewMatrix  = glm::translate(m_viewMatrix, glm::vec3(-0.9f, -0.5f, -7.0f));
+	m_projMatrix  = glm::perspective(glm::radians(45.0f), (float)Renderer::WindowWidth / (float)Renderer::WindowHeight, 0.1f, 100.0f);
+	
+	GetShader()->setMat4Uniform("model", m_modelMatrix);
+	GetShader()->setMat4Uniform("view", m_viewMatrix);
+	GetShader()->setMat4Uniform("projection", m_projMatrix);
+
 }
 
 void Mesh::SetUniforms(std::string matName)
