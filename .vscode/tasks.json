@@ -7,22 +7,22 @@
 			"command": "/usr/bin/g++",
 			"args": [
 				"-fdiagnostics-color=always",
-                "-Wall",
-                "-Werror",
-                "-std=c++17",
-                "-Iinclude",
-                "-I/usr/local/include",
-                "src/*.cpp",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}",
+				"-Wall",
+				"-Werror",
+				"-std=c++17",
+				"-I../include",
+				"-I/usr/local/include",
+				"../src/*.cpp",
+				"-g",
+				"${file}",
+				"-o",
+				"${workspaceFolder}/build/${fileBasenameNoExtension}",
 				"-lGL",
 				"-lGLEW",
 				"-lSDL2"
 			],
 			"options": {
-				"cwd": "${fileDirname}"
+				"cwd": "${workspaceFolder}/build"
 			},
 			"problemMatcher": [
 				"$gcc"
