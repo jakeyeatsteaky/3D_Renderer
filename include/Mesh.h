@@ -22,17 +22,19 @@ public:
 	void SetUniforms(std::string matName);
 	void SetModelMatrix(glm::mat4 trans);
 	void Render();
-	void Update();
+	void Update(float time);
 	void InitMesh();
 	
 	std::shared_ptr<Shader> GetShader();
 
+	glm::mat4 m_modelMatrix;
+	glm::mat4 m_viewMatrix;
+	glm::mat4 m_projMatrix;
 
 private:
 	VertexArray m_vao;
 	std::weak_ptr<Shader> m_shaderProgram;
 	std::weak_ptr<Texture> m_meshTexture; 
-	glm::mat4 m_modelMatrix;
 };
 
 
