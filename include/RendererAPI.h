@@ -22,11 +22,11 @@ namespace Renderer
 	constexpr int WindowWidth = 800;
 	constexpr int WindowHeight = 600;
 	constexpr uint32_t CLEAR_COLOR = 0xff00ffff;
-	constexpr const char* VERTEX_PATH = "shaders/shader1.vert";
-	constexpr const char* FRAGMENT_PATH = "shaders/shader1.frag";
-	constexpr const char* TEXTURE_PATH = "assets/textures/wall.jpg";
-	constexpr const char* TEXTURE_PATH2 = "assets/textures/awesomeface.png";
-	constexpr const char* VERTEX_DATA_PATH = "assets/vertex_data/vertices.txt";
+	constexpr const char* VERTEX_PATH = "../shaders/shader1.vert";
+	constexpr const char* FRAGMENT_PATH = "../shaders/shader1.frag";
+	constexpr const char* TEXTURE_PATH = "../assets/textures/wall.jpg";
+	constexpr const char* TEXTURE_PATH2 = "../assets/textures/awesomeface.png";
+	constexpr const char* VERTEX_DATA_PATH = "../assets/vertex_data/vertices.txt";
 }
 
 

@@ -37,7 +37,7 @@ void Renderer_GL::Init() const
 	// What shoiuld happen is vertex info should be passed in and mesh should be created that way
 
 	std::shared_ptr<Mesh> mesh1 = std::make_shared<Mesh>(m_shaders[0], m_textures[0]);
-	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_shaders[0], m_textures[1]);
+	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_shaders[0], m_textures[0]);
 	m_meshes.push_back(mesh1);
 	m_meshes.push_back(mesh2);
 
