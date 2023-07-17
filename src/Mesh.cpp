@@ -8,30 +8,39 @@
 
 #include <fstream>
 
-Mesh::Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTexture):
+Mesh::Mesh(
+		std::weak_ptr<VertexBuffer> vertexBuffer,
+		std::weak_ptr<IndexBuffer> indexBuffer,
+		std::weak_ptr<Shader> shaderProgram, 
+		std::weak_ptr<Texture> meshTexture, 
+		unsigned numAttributes):
+
 	m_modelMatrix(glm::mat4(1.0)),
 	m_viewMatrix(glm::mat4(1.0)),
 	m_projMatrix(glm::mat4(1.0)),
+	m_vbo(vertexBuffer),
+	m_ibo(indexBuffer),
 	m_shaderProgram(shaderProgram),
 	m_meshTexture(meshTexture)
 {
-	VertexLayout attributeLayout_3(3);
+	VertexLayout attributeLayout_3(numAttributes);
+	std::shared_ptr<VertexBuffer> vbo = m_vbo.lock();
+	std::shared_ptr<IndexBuffer> ibo = m_ibo.lock();
 
 	m_vao.Bind();
-	// VertexBuffer vertexBuffer(vertices, sizeof(vertices));
-	// IndexBuffer indexBuffer(indices, sizeof(indices));
-	// attributeLayout_3.SetLayout(0, 3, 0, 0);	// Set Layout: Position idx 0
-	
-	// VertexBuffer colorBuffer(colors, sizeof(colors));
-	// attributeLayout_3.SetLayout(1, 3, 0, 0);	// Set Layout: Color idx 1
+	if(vbo && ibo){ 
+		vbo->Bind();
+		ibo->Bind();
+	} else {
+		std::cout << "ERROR::Unable to bind Vertex/Index buffers\n";
+	}
 
-	// VertexBuffer texCoordBuffer(texCoords, sizeof(texCoords));
-	// attributeLayout_3.SetLayout(2, 2, 0, 0);	// Set Layout: TexCoords idx 2
+	attributeLayout_3.SetLayout(0, 3, 8, 0);	// Set Layout: Position idx 0
+	attributeLayout_3.SetLayout(1, 3, 8, 3);	// Set Layout: Color idx 1
+	attributeLayout_3.SetLayout(2, 2, 8, 6);	// Set Layout: TexCoords idx 2
 
-	// // Clear bindings (don't clear index buffer)
-	// texCoordBuffer.ClearFromBinding();
-	// colorBuffer.ClearFromBinding();
-	// vertexBuffer.ClearFromBinding();
+	vbo->ClearFromBinding();
+	// dont clear the index buffer
 	m_vao.ClearFromBinding();
 }
 

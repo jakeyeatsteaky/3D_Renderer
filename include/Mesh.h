@@ -16,7 +16,9 @@ public:
 		std::weak_ptr<VertexBuffer> vertexBuffer,
 		std::weak_ptr<IndexBuffer> indexBuffer,
 		std::weak_ptr<Shader> shaderProgram, 
-		std::weak_ptr<Texture> meshTexture);
+		std::weak_ptr<Texture> meshTexture,
+		unsigned numAttributes);
+
 
 	Mesh(VertexArray&& vao, std::weak_ptr<Shader> shaderProgram) : m_vao(std::move(vao)), m_shaderProgram(shaderProgram) {}
 	~Mesh() = default;

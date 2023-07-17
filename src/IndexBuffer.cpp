@@ -28,6 +28,12 @@ void IndexBuffer::Bind(const unsigned int* indices, const GLsizeiptr indexBuffer
 
 }
 
+void IndexBuffer::Bind() const
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboIdx);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indicesSize, m_indices, GL_STATIC_DRAW);
+}
+
 unsigned int IndexBuffer::GetIdx()
 {
 	return m_iboIdx;

@@ -10,6 +10,7 @@ public:
 	~IndexBuffer();
 
 	void Bind(const unsigned int* indices, GLsizeiptr indexBufferSize);
+	void Bind() const;
 	unsigned int GetIdx();
 	void ClearFromBinding();
 	void Destroy();

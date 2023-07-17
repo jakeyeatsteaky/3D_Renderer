@@ -10,6 +10,7 @@ public:
 	~VertexBuffer();
 
 	void Bind(const float* vertices, const GLsizeiptr VertexBufferSize);
+	void Bind() const;
 	unsigned int GetIdx();
 	void ClearFromBinding();
 	void Destroy();

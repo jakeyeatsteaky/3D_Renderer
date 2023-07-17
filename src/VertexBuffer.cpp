@@ -29,6 +29,12 @@ void VertexBuffer::Bind(const float* vertices, const GLsizeiptr VertexBufferSize
 
 }
 
+void VertexBuffer::Bind() const
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_vboIdx);
+	glBufferData(GL_ARRAY_BUFFER, m_verticesSize, m_vertices, GL_STATIC_DRAW);
+}
+
 unsigned int VertexBuffer::GetIdx() 
 {
 	return m_vboIdx;
