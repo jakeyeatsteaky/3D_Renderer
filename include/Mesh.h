@@ -2,6 +2,8 @@
 #define MESH_H
 #include "GL/glew.h"
 #include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 #include "Shaders.h"
 #include "Texture.h"
 #include <memory>
@@ -10,7 +12,11 @@ class Mesh
 {
 public:
 	// Apply the rule of five here - potentiall pass a Vertex Array by const reference, rvalue reference, etc
-	Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTexture);
+	Mesh(
+		std::weak_ptr<VertexBuffer> vertexBuffer,
+		std::weak_ptr<IndexBuffer> indexBuffer,
+		std::weak_ptr<Shader> shaderProgram, 
+		std::weak_ptr<Texture> meshTexture);
 
 	Mesh(VertexArray&& vao, std::weak_ptr<Shader> shaderProgram) : m_vao(std::move(vao)), m_shaderProgram(shaderProgram) {}
 	~Mesh() = default;
@@ -33,6 +39,8 @@ public:
 
 private:
 	VertexArray m_vao;
+	std::weak_ptr<VertexBuffer> m_vbo;
+	std::weak_ptr<IndexBuffer> m_ibo;
 	std::weak_ptr<Shader> m_shaderProgram;
 	std::weak_ptr<Texture> m_meshTexture; 
 };

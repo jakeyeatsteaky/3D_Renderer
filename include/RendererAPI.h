@@ -26,7 +26,8 @@ namespace Renderer
 	constexpr const char* FRAGMENT_PATH = "../shaders/shader1.frag";
 	constexpr const char* TEXTURE_PATH = "../assets/textures/wall.jpg";
 	constexpr const char* TEXTURE_PATH2 = "../assets/textures/awesomeface.png";
-	constexpr const char* VERTEX_DATA_PATH = "../assets/vertex_data/vertices.txt";
+	constexpr const char* VERTEX_DATA_PATH = "../assets/vertex_data/";
+	constexpr const char* INDEX_DATA_PATH = "../assets/index_data/";
 }
 
 
@@ -46,6 +47,7 @@ public:
 	virtual void SetupShaders() const override;
 	virtual void SetupTextures() const override;
 	virtual bool InitSuccess() const override;
+	virtual void SetupVertexData() const override;
 	std::vector<std::shared_ptr<Mesh>> GetMeshes() const;
 
 	//mutable Mesh* m_mesh;
@@ -56,6 +58,8 @@ private:
 	mutable SDL_Window* m_window;
 	mutable SDL_Renderer* m_renderer;
 	mutable SDL_GLContext m_context;
+	mutable std::vector<std::shared_ptr<VertexBuffer>> m_vertexBuffers;
+	mutable std::vector<std::shared_ptr<IndexBuffer>> m_indexBuffers;
 	mutable std::vector<std::shared_ptr<Mesh>> m_meshes;
 	mutable std::vector<std::shared_ptr<Shader>>m_shaders;
 	mutable std::vector<std::shared_ptr<Texture>> m_textures;
@@ -76,6 +80,7 @@ public:
 	virtual void SetupShaders() const override;
 	virtual void SetupTextures() const override;
 	virtual bool InitSuccess() const override;
+	virtual void SetupVertexData() const override;
 
 private:
 	mutable SDL_Window* m_window;
@@ -94,7 +99,6 @@ public:
 	virtual void ClearScreen() const override;
 	virtual void SetupShaders() const override;
 	virtual void SetupTextures() const override;
-	virtual bool InitSuccess() const override;
 };
 
 

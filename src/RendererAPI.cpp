@@ -1,14 +1,14 @@
 #include "RendererAPI.h"
 #include "Texture.h"
-
+#include <fstream>
+#include <cstring>
 
 // =================================== RENDERER_OPEN_GL ===================================
-Renderer_GL::Renderer_GL() : 
-	m_window(nullptr),
-	m_renderer(nullptr),
-	m_context(NULL)
+Renderer_GL::Renderer_GL() : m_window(nullptr),
+							 m_renderer(nullptr),
+							 m_context(NULL)
 {
-	Init();
+
 }     
 
 Renderer_GL::~Renderer_GL()
@@ -19,7 +19,7 @@ Renderer_GL::~Renderer_GL()
 	SDL_Quit();
 }
 
-void Renderer_GL::Init() const 
+void Renderer_GL::Init() const
 {
 	OpenWindow();
 
@@ -32,43 +32,41 @@ void Renderer_GL::Init() const
 
 	SetupShaders();
 	SetupTextures();
+	SetupVertexData();
 
-	// Right now vertex buffer info is populated in the constructor for a mesh
-	// What shoiuld happen is vertex info should be passed in and mesh should be created that way
-
-	std::shared_ptr<Mesh> mesh1 = std::make_shared<Mesh>(m_shaders[0], m_textures[0]);
-	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_shaders[0], m_textures[0]);
+	std::shared_ptr<Mesh> mesh1 = std::make_shared<Mesh>(m_vertexBuffers[0], m_indexBuffers[0], m_shaders[0], m_textures[0]);
+	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_vertexBuffers[0], m_indexBuffers[0], m_shaders[0], m_textures[0]);
 	m_meshes.push_back(mesh1);
 	m_meshes.push_back(mesh2);
-
 }
 
 void Renderer_GL::Input() const
 {
-
 }
 
-void Renderer_GL::Update() 
+void Renderer_GL::Update()
 {
-	for(auto& mesh : m_meshes)
+	for (auto &mesh : m_meshes)
 	{
-		float time = static_cast<float>(SDL_GetTicks())/1000;
+		float time = static_cast<float>(SDL_GetTicks()) / 1000;
 		mesh->Update(time);
 	}
 }
 
-void Renderer_GL::Render() const {
+void Renderer_GL::Render() const
+{
 
 	ClearScreen();
-	for(auto& mesh : m_meshes)
+	for (auto &mesh : m_meshes)
 		mesh->Render();
-	
+
 	SDL_GL_SwapWindow(m_window);
 }
 
-
-void Renderer_GL::OpenWindow() const {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+void Renderer_GL::OpenWindow() const
+{
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	{
 		std::cerr << "Error initializing SDL\n";
 		return;
 	}
@@ -80,13 +78,14 @@ void Renderer_GL::OpenWindow() const {
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 	// Create the window using SDL
-	m_window = SDL_CreateWindow(Renderer::WINDOW_TITLE, 
-							  SDL_WINDOWPOS_UNDEFINED, 
-							  SDL_WINDOWPOS_UNDEFINED, 
-							  (int)Renderer::WindowWidth,
-							  (int)Renderer::WindowHeight, 
-							  SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-	if (!m_window) {
+	m_window = SDL_CreateWindow(Renderer::WINDOW_TITLE,
+								SDL_WINDOWPOS_UNDEFINED,
+								SDL_WINDOWPOS_UNDEFINED,
+								(int)Renderer::WindowWidth,
+								(int)Renderer::WindowHeight,
+								SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+	if (!m_window)
+	{
 		std::cerr << "Error creating SDL window\n";
 		return;
 	}
@@ -111,16 +110,15 @@ void Renderer_GL::OpenWindow() const {
 	glViewport(0, 0, (GLsizei)Renderer::WindowWidth, (GLsizei)Renderer::WindowHeight);
 
 	std::cout << "GL VERSION: " << glGetString(GL_VERSION) << std::endl;
-	
 }
 
-void Renderer_GL::ClearScreen() const 
+void Renderer_GL::ClearScreen() const
 {
-	glClearColor((GLclampf)0.5,(GLclampf) 0.3, (GLclampf)1.0,(GLclampf) 1.0);
+	glClearColor((GLclampf)0.5, (GLclampf)0.3, (GLclampf)1.0, (GLclampf)1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer_GL::SetupShaders() const 
+void Renderer_GL::SetupShaders() const
 {
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>(Renderer::VERTEX_PATH, Renderer::FRAGMENT_PATH);
 	m_shaders.push_back(shader);
@@ -134,13 +132,7 @@ void Renderer_GL::SetupTextures() const
 	m_textures.push_back(texture2);
 }
 
-bool Renderer_GL::InitSuccess() const
-{
-	std::cout << "yes" << std::endl;
-	return true;
-}
-
-std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const 
+std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const
 {
 	return m_meshes;
 }
@@ -151,7 +143,7 @@ std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const
 
 
 
-  
+
 
 
 
@@ -164,64 +156,43 @@ Renderer_Vulk::Renderer_Vulk() :
 	m_window(nullptr),
 	m_isInitialized(false)
 {
-	Init();
+
 }
 
 Renderer_Vulk::~Renderer_Vulk()
 {
-
 }
 
 void Renderer_Vulk::Init() const {
-	// We initialize SDL and create a window with it. 
-	SDL_Init(SDL_INIT_VIDEO);
-
-	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
-	;
-
-	//create blank SDL window for our application
-	m_window = SDL_CreateWindow(
-		"Vulkan Engine", //window title
-		SDL_WINDOWPOS_UNDEFINED, //window position x (don't care)
-		SDL_WINDOWPOS_UNDEFINED, //window position y (don't care)
-		Renderer::WindowWidth,  //window width in pixels
-		Renderer::WindowHeight, //window height in pixels
-		window_flags);
-
-	//everything went fine
-	m_isInitialized = true;
-}
-
-void Renderer_Vulk::Render() const {
 
 }
 
-void Renderer_Vulk::Update() 
+void Renderer_Vulk::Render() const
 {
+}
 
+void Renderer_Vulk::Update()
+{
 }
 
 void Renderer_Vulk::Input() const
 {
-
 }
 
-void Renderer_Vulk::OpenWindow() const {
-
+void Renderer_Vulk::OpenWindow() const
+{
 }
 
-void Renderer_Vulk::ClearScreen() const {
-
+void Renderer_Vulk::ClearScreen() const
+{
 }
 
 void Renderer_Vulk::SetupShaders() const
 {
-	
 }
 
 void Renderer_Vulk::SetupTextures() const
 {
-
 }
 
 bool Renderer_Vulk::InitSuccess() const
@@ -229,59 +200,54 @@ bool Renderer_Vulk::InitSuccess() const
 	return m_isInitialized;
 }
 
+void Renderer_Vulk::SetupVertexData() const
+{
+}
 
 // =================================== RENDERER_DX3D ===================================
 
 Renderer_DX::Renderer_DX()
 {
-
 }
 
 Renderer_DX::~Renderer_DX()
 {
-
 }
 
-void Renderer_DX::Init() const {
-
-}
-
-void Renderer_DX::Render() const {
-
-}
-
-void Renderer_DX::OpenWindow() const {
-
-}
-
-void Renderer_DX::Update() 
+void Renderer_DX::Init() const
 {
-
 }
 
-void Renderer_DX::ClearScreen() const {
+void Renderer_DX::Render() const
+{
+}
 
+void Renderer_DX::OpenWindow() const
+{
+}
+
+void Renderer_DX::Update()
+{
+}
+
+void Renderer_DX::ClearScreen() const
+{
 }
 
 void Renderer_DX::SetupShaders() const
 {
-	
 }
 
 void Renderer_DX::SetupTextures() const
 {
+}
 
+void Renderer_DX::SetupVertexData() const
+{
 }
 
 void Renderer_DX::Input() const
 {
-
-}
-
-bool Renderer_DX::InitSuccess() const
-{
-	std::cout << "yes" << std::endl;
-	return true;
 }
 
 

@@ -15,49 +15,23 @@ Mesh::Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTextu
 	m_shaderProgram(shaderProgram),
 	m_meshTexture(meshTexture)
 {
-	float vertices[] = {
-		 0.5f,  0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		-0.5f, -0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f
-	};
-
-	unsigned int indices[] = { 
-		0, 1, 3,  
-		1, 2, 3   
-	};
-
-	float colors[] = {
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f
-	};
-
-	float texCoords[] = {
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 0.0f
-	};
-
 	VertexLayout attributeLayout_3(3);
 
 	m_vao.Bind();
-	VertexBuffer vertexBuffer(vertices, sizeof(vertices));
-	IndexBuffer indexBuffer(indices, sizeof(indices));
-	attributeLayout_3.SetLayout(0, 3, 0, 0);	// Set Layout: Position idx 0
+	// VertexBuffer vertexBuffer(vertices, sizeof(vertices));
+	// IndexBuffer indexBuffer(indices, sizeof(indices));
+	// attributeLayout_3.SetLayout(0, 3, 0, 0);	// Set Layout: Position idx 0
 	
-	VertexBuffer colorBuffer(colors, sizeof(colors));
-	attributeLayout_3.SetLayout(1, 3, 0, 0);	// Set Layout: Color idx 1
+	// VertexBuffer colorBuffer(colors, sizeof(colors));
+	// attributeLayout_3.SetLayout(1, 3, 0, 0);	// Set Layout: Color idx 1
 
-	VertexBuffer texCoordBuffer(texCoords, sizeof(texCoords));
-	attributeLayout_3.SetLayout(2, 2, 0, 0);	// Set Layout: TexCoords idx 2
+	// VertexBuffer texCoordBuffer(texCoords, sizeof(texCoords));
+	// attributeLayout_3.SetLayout(2, 2, 0, 0);	// Set Layout: TexCoords idx 2
 
-	// Clear bindings (don't clear index buffer)
-	texCoordBuffer.ClearFromBinding();
-	colorBuffer.ClearFromBinding();
-	vertexBuffer.ClearFromBinding();
+	// // Clear bindings (don't clear index buffer)
+	// texCoordBuffer.ClearFromBinding();
+	// colorBuffer.ClearFromBinding();
+	// vertexBuffer.ClearFromBinding();
 	m_vao.ClearFromBinding();
 }
 

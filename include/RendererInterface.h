@@ -26,7 +26,7 @@ public:
 	virtual void SetupShaders() const = 0;
 	virtual void SetupTextures() const = 0;
 	virtual bool InitSuccess() const = 0;
-
+	virtual void SetupVertexData() const = 0;
 
 private:
 	std::unordered_map<std::string, Mesh*> m_meshMap;

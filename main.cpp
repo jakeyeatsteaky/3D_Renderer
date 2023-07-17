@@ -19,8 +19,7 @@
 10) [ ] Make some primitive shapes.
 
 ** start here next time****
-11) [ ] make fail state bools to trigger "app not successfully set up" when shaders or assets arent found
-12) [x] Texture binding functions
+11) [ ] Make Vertex structs to pass into Mesh objects
 13) [ ] Continue on with the OpenGL tutorial.  Mesh objects are created - now work on 3d objects and cameras
 		[ ] Coordinate Systems Section
 
