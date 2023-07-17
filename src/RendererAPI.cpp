@@ -35,9 +35,9 @@ void Renderer_GL::Init() const
 	SetupVertexData();
 
 	std::shared_ptr<Mesh> mesh1 = std::make_shared<Mesh>(m_vertexBuffers[0], m_indexBuffers[0], m_shaders[0], m_textures[0], 3);
-	//std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_vertexBuffers[0], m_indexBuffers[0], m_shaders[0], m_textures[0]);
+	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_vertexBuffers[1], m_indexBuffers[1], m_shaders[0], m_textures[0], 2);
 	m_meshes.push_back(mesh1);
-	//m_meshes.push_back(mesh2);
+	m_meshes.push_back(mesh2);
 }
 
 void Renderer_GL::Input() const

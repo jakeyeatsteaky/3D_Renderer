@@ -19,7 +19,8 @@
 10) [ ] Make some primitive shapes.
 
 ** start here next time****
-11) [ ] Make Vertex structs to pass into Mesh objects
+11) [x] Make Vertex structs to pass into Mesh objects
+12) [ ] Get the Cube to work being passed into a Mesh - Main issue is with the attribtue layout(since the cube vertices dont use a color), and also the indices buffer
 13) [ ] Continue on with the OpenGL tutorial.  Mesh objects are created - now work on 3d objects and cameras
 		[ ] Coordinate Systems Section
 
