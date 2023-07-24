@@ -18,18 +18,18 @@
  9) [ ] Rule of 5 for my existing render classes (vbuf, ibuf, varray, vlayout, mesh)
 10) [ ] Make some primitive shapes.
 
-** start here next time****
 11) [x] Make Vertex structs to pass into Mesh objects
-12) [ ] Get the Cube to work being passed into a Mesh - Main issue is with the attribtue layout(since the cube vertices dont use a color), and also the indices buffer
-		Another thing to consider is that my cube vertices require gldrawtriangles
+12) [x] Get the Cube to work being passed into a Mesh - Main issue is with the attribtue layout(since the cube vertices dont use a color), and also the indices buffer
+		Retrospective: What ended up happening is that when I was updating the meshes, it did 
+		some calculations on their matrices.  The last shader to have been set was the prevuious 
+		mesh so it was never showing the first one
+		I just had to add SetShader() in the update function.
 
-		- 1) need to add the vertexLayout as a parameter of a mesh to be determined when constructing the mesh
-		- 2) need a different mesh constructor based on if its using index buffer
-		- 3) different draw function depending on whether or not its using an index buffer
-
-
-		Right now the cube is being rendered but the square is not
-13) [ ] Continue on with the OpenGL tutorial.  Mesh objects are created - now work on 3d objects and cameras
+	*****START HERE NEXT TIME *****
+13) [ ] Get some more meshes in here and verify all VertesLayouts
+		[ ] More vertices added and test layouts in all forms with different m_viewMatric (position)
+		[ ] The vectors probably need to be better because its getting confusing
+14) [ ] Continue on with the OpenGL tutorial.  Mesh objects are created - now work on 3d objects and cameras
 		[ ] Coordinate Systems Section
 
 #endif
