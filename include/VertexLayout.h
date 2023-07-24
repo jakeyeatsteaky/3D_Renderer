@@ -10,7 +10,7 @@ public:
     ~VertexLayout() = default;
 
     void SetLayouts();
-    void SetLayout(size_t index, size_t size, size_t stride, size_t offset);
+    void SetLayout(size_t index, size_t size, size_t stride, size_t offset, bool intType = false);
     bool ReadyForUse();
 
 private:

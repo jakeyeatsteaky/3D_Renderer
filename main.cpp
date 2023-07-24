@@ -26,6 +26,9 @@
 		- 1) need to add the vertexLayout as a parameter of a mesh to be determined when constructing the mesh
 		- 2) need a different mesh constructor based on if its using index buffer
 		- 3) different draw function depending on whether or not its using an index buffer
+
+
+		Right now the cube is being rendered but the square is not
 13) [ ] Continue on with the OpenGL tutorial.  Mesh objects are created - now work on 3d objects and cameras
 		[ ] Coordinate Systems Section
 

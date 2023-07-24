@@ -45,12 +45,12 @@ void Renderer_GL::Init() const
 
 	// Cube
 	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_vertexBuffers[1], 
-														 m_indexBuffers[1], 
+														 m_indexBuffers[0], 
 														 m_shaders[0], 
 														 m_textures[0], 
 														 m_vertexLayouts[1]);
-	m_meshes.push_back(mesh1);
 	m_meshes.push_back(mesh2);
+	m_meshes.push_back(mesh1);
 }
 
 void Renderer_GL::Input() const
@@ -59,21 +59,25 @@ void Renderer_GL::Input() const
 
 void Renderer_GL::Update()
 {
-	for (auto &mesh : m_meshes)
+	for (auto mesh : m_meshes)
 	{
 		float time = static_cast<float>(SDL_GetTicks()) / 1000;
 		mesh->Update(time);
 	}
+
 }
 
 void Renderer_GL::Render() const
 {
 
 	ClearScreen();
-	for (auto &mesh : m_meshes)
+	for (auto mesh : m_meshes)
+	{
 		mesh->Render();
+	}
 
-	SDL_GL_SwapWindow(m_window);
+    SDL_GL_SwapWindow(m_window);
+
 }
 
 void Renderer_GL::OpenWindow() const
@@ -149,11 +153,12 @@ void Renderer_GL::SetupTextures() const
 
 void Renderer_GL::SetupVertexData() const
 {
-	size_t numImports = 2; 
+	size_t numImports = 3; 
 
 	std::vector<const char*> paths_to_vertexdata = {};
 	paths_to_vertexdata.push_back("../assets/vertex_data/square.txt");
 	paths_to_vertexdata.push_back("../assets/vertex_data/cube.txt");
+	paths_to_vertexdata.push_back("../assets/vertex_data/square_no_color.txt");
 	paths_to_vertexdata.push_back("../assets/index_data/square_indices.txt");
 	paths_to_vertexdata.push_back("../assets/index_data/cube_indices.txt");
 
@@ -188,7 +193,7 @@ void Renderer_GL::SetupVertexData() const
 			if (!file)
 				std::cerr << "Failed to open the file.\n";
 			else { 
-		 		float number;
+		 		unsigned number;
 				while (file >> number) {
 					if(number == '#') 
             			file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
