@@ -3,6 +3,7 @@
 #include "GL/glew.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
+#include "VertexLayout.h"
 #include "IndexBuffer.h"
 #include "Shaders.h"
 #include "Texture.h"
@@ -43,8 +44,10 @@ private:
 	VertexArray m_vao;
 	std::weak_ptr<VertexBuffer> m_vbo;
 	std::weak_ptr<IndexBuffer> m_ibo;
+	std::weak_ptr<VertexLayout> m_layout;
 	std::weak_ptr<Shader> m_shaderProgram;
 	std::weak_ptr<Texture> m_meshTexture; 
+	bool m_useIdxBuf;
 };
 
 

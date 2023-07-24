@@ -30,12 +30,25 @@ void Renderer_GL::Init() const
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
+	SetupVertexData();
 	SetupShaders();
 	SetupTextures();
-	SetupVertexData();
+	SetupVertexLayouts();
 
-	std::shared_ptr<Mesh> mesh1 = std::make_shared<Mesh>(m_vertexBuffers[0], m_indexBuffers[0], m_shaders[0], m_textures[0], 3);
-	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_vertexBuffers[1], m_indexBuffers[1], m_shaders[0], m_textures[0], 2);
+	// Square
+	std::shared_ptr<Mesh> mesh1 = std::make_shared<Mesh>(m_vertexBuffers[0], 
+														 m_indexBuffers[0], 
+														 m_shaders[1], 
+														 m_textures[1], 
+														 m_vertexLayouts[2],
+														 true);
+
+	// Cube
+	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(m_vertexBuffers[1], 
+														 m_indexBuffers[1], 
+														 m_shaders[0], 
+														 m_textures[0], 
+														 m_vertexLayouts[1]);
 	m_meshes.push_back(mesh1);
 	m_meshes.push_back(mesh2);
 }
@@ -120,8 +133,10 @@ void Renderer_GL::ClearScreen() const
 
 void Renderer_GL::SetupShaders() const
 {
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>(Renderer::VERTEX_PATH, Renderer::FRAGMENT_PATH);
-	m_shaders.push_back(shader);
+	std::shared_ptr<Shader> shader0 = std::make_shared<Shader>(Renderer::VERTEX_PATH, Renderer::FRAGMENT_PATH);
+	std::shared_ptr<Shader> shader1 = std::make_shared<Shader>(Renderer::VERTEX_PATH_2, Renderer::FRAGMENT_PATH_2);
+	m_shaders.push_back(shader0);
+	m_shaders.push_back(shader1);
 }
 
 void Renderer_GL::SetupTextures() const
@@ -130,6 +145,64 @@ void Renderer_GL::SetupTextures() const
 	std::shared_ptr<Texture> texture2 = std::make_shared<Texture>(Renderer::TEXTURE_PATH2, Extension_Type_PNG);
 	m_textures.push_back(texture);
 	m_textures.push_back(texture2);
+}
+
+void Renderer_GL::SetupVertexData() const
+{
+	size_t numImports = 2; 
+
+	std::vector<const char*> paths_to_vertexdata = {};
+	paths_to_vertexdata.push_back("../assets/vertex_data/square.txt");
+	paths_to_vertexdata.push_back("../assets/vertex_data/cube.txt");
+	paths_to_vertexdata.push_back("../assets/index_data/square_indices.txt");
+	paths_to_vertexdata.push_back("../assets/index_data/cube_indices.txt");
+
+	// import data
+	for(size_t i = 0; i < numImports; ++i)
+	{
+		std::vector<float> datavec = {};
+		try {
+			std::ifstream file(paths_to_vertexdata[i], std::ios::in);
+			if (!file)
+				std::cerr << "Failed to open the file.\n";
+			else { 
+		 		float number;
+				while (file >> number) {
+					if(number == '#') 
+            			file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+					else
+						datavec.push_back(number);
+				}
+			}	 
+		}
+		catch (const std::ifstream::failure &e) { std::cerr << "Exception occurred while handling the file: " << e.what() << '\n'; }
+		std::shared_ptr<VertexBuffer> square = std::make_shared<VertexBuffer>(datavec);
+		m_vertexBuffers.push_back(square);
+	}
+
+	for(size_t i = 0; i < numImports; ++i)
+	{
+		std::vector<unsigned> datavec = {};
+		try {
+			std::ifstream file(paths_to_vertexdata[i+2], std::ios::in);
+			if (!file)
+				std::cerr << "Failed to open the file.\n";
+			else { 
+		 		float number;
+				while (file >> number) {
+					if(number == '#') 
+            			file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+					else
+						datavec.push_back(number);
+				}
+			}	
+		} 
+		catch (const std::ifstream::failure &e) { std::cerr << "Exception occurred while handling the file: " << e.what() << '\n'; }
+
+		std::shared_ptr<IndexBuffer> square = std::make_shared<IndexBuffer>(datavec);
+		m_indexBuffers.push_back(square);
+	}
+
 }
 
 std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const
@@ -204,6 +277,10 @@ void Renderer_Vulk::SetupVertexData() const
 {
 }
 
+void Renderer_Vulk::SetupVertexLayouts() const 
+{
+}
+
 // =================================== RENDERER_DX3D ===================================
 
 Renderer_DX::Renderer_DX()
@@ -243,6 +320,10 @@ void Renderer_DX::SetupTextures() const
 }
 
 void Renderer_DX::SetupVertexData() const
+{
+}
+
+void Renderer_DX::SetupVertexLayouts() const 
 {
 }
 

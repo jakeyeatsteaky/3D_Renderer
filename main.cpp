@@ -21,6 +21,11 @@
 ** start here next time****
 11) [x] Make Vertex structs to pass into Mesh objects
 12) [ ] Get the Cube to work being passed into a Mesh - Main issue is with the attribtue layout(since the cube vertices dont use a color), and also the indices buffer
+		Another thing to consider is that my cube vertices require gldrawtriangles
+
+		- 1) need to add the vertexLayout as a parameter of a mesh to be determined when constructing the mesh
+		- 2) need a different mesh constructor based on if its using index buffer
+		- 3) different draw function depending on whether or not its using an index buffer
 13) [ ] Continue on with the OpenGL tutorial.  Mesh objects are created - now work on 3d objects and cameras
 		[ ] Coordinate Systems Section
 

@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
+#include "enumerations.h"
 #include "Shaders.h"
 #include "Texture.h"
 #include "VertexArray.h"
@@ -24,6 +25,8 @@ namespace Renderer
 	constexpr uint32_t CLEAR_COLOR = 0xff00ffff;
 	constexpr const char* VERTEX_PATH = "../shaders/shader1.vert";
 	constexpr const char* FRAGMENT_PATH = "../shaders/shader1.frag";
+	constexpr const char* VERTEX_PATH_2 = "../shaders/shader2.vert";
+	constexpr const char* FRAGMENT_PATH_2 = "../shaders/shader2.frag";
 	constexpr const char* TEXTURE_PATH = "../assets/textures/wall.jpg";
 	constexpr const char* TEXTURE_PATH2 = "../assets/textures/awesomeface.png";
 	constexpr const char* VERTEX_DATA_PATH = "../assets/vertex_data/";
@@ -48,10 +51,8 @@ public:
 	virtual void SetupTextures() const override;
 	virtual bool InitSuccess() const override;
 	virtual void SetupVertexData() const override;
+	virtual void SetupVertexLayouts() const override;
 	std::vector<std::shared_ptr<Mesh>> GetMeshes() const;
-
-	//mutable Mesh* m_mesh;
-	//mutable Mesh* m_mesh2;
 
 private:
 
@@ -63,6 +64,7 @@ private:
 	mutable std::vector<std::shared_ptr<Mesh>> m_meshes;
 	mutable std::vector<std::shared_ptr<Shader>>m_shaders;
 	mutable std::vector<std::shared_ptr<Texture>> m_textures;
+	mutable std::vector<std::shared_ptr<VertexLayout>> m_vertexLayouts;
 
 };
 
@@ -85,6 +87,7 @@ public:
 private:
 	mutable SDL_Window* m_window;
 	mutable bool m_isInitialized;
+	virtual void SetupVertexLayouts() const override;	
 };
 
 class Renderer_DX : public RendererInterface {
@@ -99,6 +102,8 @@ public:
 	virtual void ClearScreen() const override;
 	virtual void SetupShaders() const override;
 	virtual void SetupTextures() const override;
+	virtual void SetupVertexData() const override;
+	virtual void SetupVertexLayouts() const override;
 };
 
 
