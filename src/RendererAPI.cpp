@@ -34,6 +34,7 @@ void Renderer_GL::Init() const
 	SetupShaders();
 	SetupTextures();
 	SetupVertexLayouts();
+	GeneratePrimitives();
 
 	// Square
 	std::shared_ptr<Mesh> mesh1 = std::make_shared<Mesh>(m_vertexBuffers[0], 
@@ -41,6 +42,7 @@ void Renderer_GL::Init() const
 														 m_shaders[1], 
 														 m_textures[1], 
 														 m_vertexLayouts[2],
+														 glm::vec3(-0.5f, -0.5f, -7.0f),
 														 true);
 
 	// Cube
@@ -48,9 +50,19 @@ void Renderer_GL::Init() const
 														 m_indexBuffers[0], 
 														 m_shaders[0], 
 														 m_textures[0], 
-														 m_vertexLayouts[1]);
-	m_meshes.push_back(mesh2);
+														 m_vertexLayouts[1],
+														 glm::vec3(0.5f, 0.5f, -17.0f));
+
+	// Sphere
+	std::shared_ptr<Mesh> mesh3 = std::make_shared<Mesh>(m_vertexBuffers[3],
+														 m_indexBuffers[0], 
+														 m_shaders[2], 
+														 m_textures[0], 
+														 m_vertexLayouts[0],
+														 glm::vec3(0.75f, 0.15f, -7.0f));
 	m_meshes.push_back(mesh1);
+	m_meshes.push_back(mesh2);
+	m_meshes.push_back(mesh3);
 }
 
 void Renderer_GL::Input() const
@@ -61,6 +73,7 @@ void Renderer_GL::Update()
 {
 	for (auto mesh : m_meshes)
 	{
+
 		float time = static_cast<float>(SDL_GetTicks()) / 1000;
 		mesh->Update(time);
 	}
@@ -73,6 +86,7 @@ void Renderer_GL::Render() const
 	ClearScreen();
 	for (auto mesh : m_meshes)
 	{
+		mesh->SetUpdate();
 		mesh->Render();
 	}
 
@@ -137,10 +151,13 @@ void Renderer_GL::ClearScreen() const
 
 void Renderer_GL::SetupShaders() const
 {
-	std::shared_ptr<Shader> shader0 = std::make_shared<Shader>(Renderer::VERTEX_PATH, Renderer::FRAGMENT_PATH);
-	std::shared_ptr<Shader> shader1 = std::make_shared<Shader>(Renderer::VERTEX_PATH_2, Renderer::FRAGMENT_PATH_2);
+	std::shared_ptr<Shader> shader0 = std::make_shared<Shader>(Renderer::VERTEX_PATH_0, Renderer::FRAGMENT_PATH_0);
+	std::shared_ptr<Shader> shader1 = std::make_shared<Shader>(Renderer::VERTEX_PATH_1, Renderer::FRAGMENT_PATH_1);
+	std::shared_ptr<Shader> shader2 = std::make_shared<Shader>(Renderer::VERTEX_PATH_2, Renderer::FRAGMENT_PATH_2);
+	
 	m_shaders.push_back(shader0);
 	m_shaders.push_back(shader1);
+	m_shaders.push_back(shader2);
 }
 
 void Renderer_GL::SetupTextures() const
@@ -185,11 +202,13 @@ void Renderer_GL::SetupVertexData() const
 		m_vertexBuffers.push_back(square);
 	}
 
-	for(size_t i = 0; i < numImports; ++i)
+	size_t numIdx = 2;
+
+	for(size_t i = numImports; i < (numImports + numIdx); ++i)
 	{
 		std::vector<unsigned> datavec = {};
 		try {
-			std::ifstream file(paths_to_vertexdata[i+2], std::ios::in);
+			std::ifstream file(paths_to_vertexdata[i], std::ios::in);
 			if (!file)
 				std::cerr << "Failed to open the file.\n";
 			else { 
@@ -215,18 +234,38 @@ std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const
 	return m_meshes;
 }
 
+void Renderer_GL::GeneratePrimitives() const
+{
+	const float PI = 3.14159265358979323846;
+	const int numLatitude = 20;
+	const int numLongitude = 20;
 
+	std::vector<float> vertices;
 
+	for (int lat = 0; lat <= numLatitude; ++lat) {
+	    float theta = lat * PI / numLatitude;
+	    float sinTheta = std::sin(theta);
+	    float cosTheta = std::cos(theta);
 
+	    for (int lon = 0; lon <= numLongitude; ++lon) {
+	        float phi = lon * 2 * PI / numLongitude;
+	        float sinPhi = std::sin(phi);
+	        float cosPhi = std::cos(phi);
 
+	        float x = cosPhi * sinTheta;
+	        float y = cosTheta;
+	        float z = sinPhi * sinTheta;
 
+	        // Add the vertex to the vector
+	        vertices.push_back(x);
+	        vertices.push_back(y);
+	        vertices.push_back(z);
+	    }
+	}
+	std::shared_ptr<VertexBuffer> sphere = std::make_shared<VertexBuffer>(vertices);
+	m_vertexBuffers.push_back(sphere);
 
-
-
-
-
-
-
+}
 
 // =================================== RENDERER_VULKAN ===================================
 

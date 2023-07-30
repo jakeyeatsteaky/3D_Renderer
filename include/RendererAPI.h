@@ -23,8 +23,10 @@ namespace Renderer
 	constexpr int WindowWidth = 800;
 	constexpr int WindowHeight = 600;
 	constexpr uint32_t CLEAR_COLOR = 0xff00ffff;
-	constexpr const char* VERTEX_PATH = "../shaders/shader1.vert";
-	constexpr const char* FRAGMENT_PATH = "../shaders/shader1.frag";
+	constexpr const char* VERTEX_PATH_0 = "../shaders/shader0.vert";
+	constexpr const char* FRAGMENT_PATH_0 = "../shaders/shader0.frag";
+	constexpr const char* VERTEX_PATH_1 = "../shaders/shader1.vert";
+	constexpr const char* FRAGMENT_PATH_1 = "../shaders/shader1.frag";
 	constexpr const char* VERTEX_PATH_2 = "../shaders/shader2.vert";
 	constexpr const char* FRAGMENT_PATH_2 = "../shaders/shader2.frag";
 	constexpr const char* TEXTURE_PATH = "../assets/textures/wall.jpg";
@@ -52,6 +54,7 @@ public:
 	virtual bool InitSuccess() const override;
 	virtual void SetupVertexData() const override;
 	virtual void SetupVertexLayouts() const override;
+	void GeneratePrimitives() const;
 	std::vector<std::shared_ptr<Mesh>> GetMeshes() const;
 
 private:

@@ -22,36 +22,29 @@ Mesh::Mesh(
 	m_layout(vertexLayout),
 	m_shaderProgram(shaderProgram),
 	m_meshTexture(meshTexture),
-	m_useIdxBuf(useIdxBuf)
+	m_useIdxBuf(useIdxBuf),
+	m_needsUpdate(false)
 {
 
 	m_vao.Bind();
 	std::shared_ptr<VertexBuffer> vbo = m_vbo.lock();
 	
+	m_viewMatrix  = glm::translate(m_viewMatrix, translationVec);
+	
 	if(useIdxBuf)
 	{
-		m_viewMatrix  = glm::translate(m_viewMatrix, glm::vec3(-0.5f, -0.5f, -7.0f));
 		std::shared_ptr<VertexLayout> vlo = m_layout.lock();
 		std::shared_ptr<IndexBuffer> ibo = m_ibo.lock();
-		std::vector<unsigned> ind = {0,1,3,1,2,3};
-		IndexBuffer i(ind);
 			if(vbo && ibo && vlo) { 
 				vbo->Bind();
-				//ibo->Bind();
-				//vlo->SetLayouts();
-
-				i.Bind();
-				VertexLayout vl(Layout_Type_Pos);
-				vl.SetLayout(0,3,8,0);
-				vl.SetLayout(1,3,8,3);
-				vl.SetLayout(2,2,8,6);
+				ibo->Bind();
+				vlo->SetLayouts();
 			} 
 			else 
 				std::cout << "ERROR::Unable to bind Vertex/Index buffers\n";
 
 	}
 	else {
-		m_viewMatrix  = glm::translate(m_viewMatrix, glm::vec3(0.5f, 0.5f, -17.0f));
 		std::shared_ptr<VertexBuffer> vbo = m_vbo.lock();
 		std::shared_ptr<VertexLayout> vlo = m_layout.lock();
 		if(vbo && vlo) { 
@@ -109,17 +102,25 @@ void Mesh::Render()
 	Draw();
 }
 
+void Mesh::SetUpdate() 
+{
+	m_needsUpdate = true;
+}
+
 void Mesh::Update([[maybe_unused]] float time)
 {
     
 	m_modelMatrix = glm::mat4(1.0f);
-	//m_viewMatrix = glm::mat4(1.0f);
 	m_projMatrix = glm::mat4(1.0f);
 
-	m_modelMatrix = glm::rotate(m_modelMatrix, time * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); 
-	//m_viewMatrix  = glm::translate(m_viewMatrix, glm::vec3(0.5f, 0.5f, -7.0f));
+	if(m_needsUpdate)
+	{
+		m_modelMatrix = glm::rotate(m_modelMatrix, time * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); 
+		m_needsUpdate = false;
+	}
+
 	m_projMatrix  = glm::perspective(glm::radians(45.0f), (float)Renderer::WindowWidth / (float)Renderer::WindowHeight, 0.1f, 100.0f);
-	
+
 	SetShader();
 	GetShader()->setMat4Uniform("model", m_modelMatrix);
 	GetShader()->setMat4Uniform("view", m_viewMatrix);

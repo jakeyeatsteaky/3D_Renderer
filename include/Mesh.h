@@ -33,6 +33,7 @@ public:
 	void Render();
 	void Update(float time);
 	void InitMesh();
+	void SetUpdate();
 	
 	std::shared_ptr<Shader> GetShader();
 
@@ -48,6 +49,7 @@ private:
 	std::weak_ptr<Shader> m_shaderProgram;
 	std::weak_ptr<Texture> m_meshTexture; 
 	bool m_useIdxBuf;
+	bool m_needsUpdate;
 };
 
 
