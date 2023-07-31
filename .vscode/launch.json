@@ -6,6 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/3DRenderer",
+            "preLaunchTask": "Build", // <-- Add this line
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build",

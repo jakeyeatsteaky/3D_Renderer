@@ -31,6 +31,8 @@
 		[ ] The vectors probably need to be better because its getting confusing
 14) [ ] Continue on with the OpenGL tutorial.  Mesh objects are created - now work on 3d objects and cameras
 		[ ] Coordinate Systems Section
+15) [ ] Imgui integration
+16) [ ] Shader Practice mode 
 
 #endif
 
@@ -76,7 +78,7 @@ How this renderer works so I can quickly get up to speed
 		- meshes have MVP matricies
 		- on construction, the VAO is bound so the vertex info can be bound to that vertex array 
 		- when rendering you just need to bind the vertex array 
-		
+
 
 #endif
 

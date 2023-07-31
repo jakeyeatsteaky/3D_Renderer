@@ -26,7 +26,32 @@
 		  "kind": "build",
 		  "isDefault": true
 		},
+		"presentation": {
+			"reveal": "always",
+			"panel": "shared",
+			"focus": true
+		  },
+		  "options": {
+			"cwd": "${workspaceFolder}/build"   // Specify the build directory here
+		  },
 		"detail": "compiler: /usr/bin/g++"
+	  },
+
+	  {
+		"label": "Build",
+		"type": "shell",
+		"command": "make",
+		"args": [],
+		"group": "build",
+		"presentation": {
+		  "reveal": "always",
+		  "panel": "shared",
+		  "focus": true
+		},
+		"options": {
+		  "cwd": "${workspaceFolder}/build"   // Specify the build directory here
+		},
+		"problemMatcher": []
 	  }
 	]
   }

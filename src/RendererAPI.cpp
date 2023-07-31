@@ -53,13 +53,14 @@ void Renderer_GL::Init() const
 														 m_vertexLayouts[1],
 														 glm::vec3(0.5f, 0.5f, -17.0f));
 
-	// Sphere
-	std::shared_ptr<Mesh> mesh3 = std::make_shared<Mesh>(m_vertexBuffers[3],
+	// Square, position only
+	std::shared_ptr<Mesh> mesh3 = std::make_shared<Mesh>(m_vertexBuffers[2],
 														 m_indexBuffers[0], 
 														 m_shaders[2], 
 														 m_textures[0], 
 														 m_vertexLayouts[0],
-														 glm::vec3(0.75f, 0.15f, -7.0f));
+														 glm::vec3(0.5f, 0.15f, -7.0f),
+														 true);
 	m_meshes.push_back(mesh1);
 	m_meshes.push_back(mesh2);
 	m_meshes.push_back(mesh3);
