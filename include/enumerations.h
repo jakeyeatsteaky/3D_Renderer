@@ -13,6 +13,12 @@ typedef enum {
 	Extension_Type_PNG = 1
 } Extension_Type;
 
+typedef enum {
+	Layout_Type_Pos = 0,
+	Layout_Type_PosCol = 1,
+	Layout_Type_PosTex = 2,
+	Layout_Type_PosColTex = 3,
+} Layout_Type;
 
 
 

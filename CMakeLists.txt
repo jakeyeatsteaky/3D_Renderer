@@ -42,6 +42,7 @@ find_package(Vulkan REQUIRED)
 
 include_directories(${OPENGL_INCLUDE_DIR}  ${GLEW_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${Vulkan_INCLUDE_DIRS})
 
+    target_compile_options(3DRenderer PRIVATE -fdiagnostics-color=always -Wall -Werror -std=c++17 -g)
 if(MSVC)
     target_link_libraries(3DRenderer ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} ${SDL2_LIBRARIES} Vulkan::Vulkan)
 else()

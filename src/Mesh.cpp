@@ -1,63 +1,64 @@
 #include "Mesh.h"
 #include "RendererAPI.h"
 #include "VertexBuffer.h"
-#include "VertexLayout.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 #include <fstream>
 
-Mesh::Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTexture):
+Mesh::Mesh(	std::weak_ptr<VertexBuffer> vertexBuffer,
+			std::weak_ptr<IndexBuffer> indexBuffer,
+			std::weak_ptr<Shader> shaderProgram, 
+			std::weak_ptr<Texture> meshTexture,
+			std::weak_ptr<VertexLayout> vertexLayout,
+			glm::vec3 translationVec,
+			bool useIdxBuf)
+:
+
 	m_modelMatrix(glm::mat4(1.0)),
 	m_viewMatrix(glm::mat4(1.0)),
 	m_projMatrix(glm::mat4(1.0)),
+	m_vbo(vertexBuffer),
+	m_ibo(indexBuffer),
+	m_layout(vertexLayout),
 	m_shaderProgram(shaderProgram),
-	m_meshTexture(meshTexture)
+	m_meshTexture(meshTexture),
+	m_useIdxBuf(useIdxBuf),
+	m_needsUpdate(false)
 {
-	float vertices[] = {
-		 0.5f,  0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		-0.5f, -0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f
-	};
-
-	unsigned int indices[] = { 
-		0, 1, 3,  
-		1, 2, 3   
-	};
-
-	float colors[] = {
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f
-	};
-
-	float texCoords[] = {
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 0.0f
-	};
-
-	VertexLayout attributeLayout_3(3);
 
 	m_vao.Bind();
-	VertexBuffer vertexBuffer(vertices, sizeof(vertices));
-	IndexBuffer indexBuffer(indices, sizeof(indices));
-	attributeLayout_3.SetLayout(0, 3, 0, 0);	// Set Layout: Position idx 0
+	std::shared_ptr<VertexBuffer> vbo = m_vbo.lock();
 	
-	VertexBuffer colorBuffer(colors, sizeof(colors));
-	attributeLayout_3.SetLayout(1, 3, 0, 0);	// Set Layout: Color idx 1
+	m_viewMatrix  = glm::translate(m_viewMatrix, translationVec);
+	
+	if(useIdxBuf)
+	{
+		std::shared_ptr<VertexLayout> vlo = m_layout.lock();
+		std::shared_ptr<IndexBuffer> ibo = m_ibo.lock();
+			if(vbo && ibo && vlo) { 
+				vbo->Bind();
+				ibo->Bind();
+				vlo->SetLayouts();
+			} 
+			else 
+				std::cout << "ERROR::Unable to bind Vertex/Index buffers\n";
 
-	VertexBuffer texCoordBuffer(texCoords, sizeof(texCoords));
-	attributeLayout_3.SetLayout(2, 2, 0, 0);	// Set Layout: TexCoords idx 2
+	}
+	else {
+		std::shared_ptr<VertexBuffer> vbo = m_vbo.lock();
+		std::shared_ptr<VertexLayout> vlo = m_layout.lock();
+		if(vbo && vlo) { 
+			vbo->Bind();
+			vlo->SetLayouts();
+		} 
+		else 
+			std::cout << "ERROR::Unable to bind Vertex/Index buffers\n";
+	}
 
-	// Clear bindings (don't clear index buffer)
-	texCoordBuffer.ClearFromBinding();
-	colorBuffer.ClearFromBinding();
-	vertexBuffer.ClearFromBinding();
+	vbo->ClearFromBinding();
+	// dont clear the index buffer
 	m_vao.ClearFromBinding();
 }
 
@@ -88,7 +89,11 @@ void Mesh::SetTexture()
 
 void Mesh::Draw()
 {
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if(m_useIdxBuf)
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void Mesh::Render()
@@ -99,19 +104,31 @@ void Mesh::Render()
 	Draw();
 }
 
-void Mesh::Update(float time)
+void Mesh::SetUpdate() 
 {
+	m_needsUpdate = true;
+}
+
+void Mesh::Update([[maybe_unused]] float time)
+{
+    
 	m_modelMatrix = glm::mat4(1.0f);
-	m_viewMatrix = glm::mat4(1.0f);
 	m_projMatrix = glm::mat4(1.0f);
-	
-	m_modelMatrix = glm::rotate(m_modelMatrix, time * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); 
-	m_viewMatrix  = glm::translate(m_viewMatrix, glm::vec3(-0.9f, -0.5f, -7.0f));
+
+	if(m_needsUpdate)
+	{
+		m_modelMatrix = glm::rotate(m_modelMatrix, time * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); 
+		m_needsUpdate = false;
+	}
+
 	m_projMatrix  = glm::perspective(glm::radians(45.0f), (float)Renderer::WindowWidth / (float)Renderer::WindowHeight, 0.1f, 100.0f);
-	
+
+	SetShader();
 	GetShader()->setMat4Uniform("model", m_modelMatrix);
 	GetShader()->setMat4Uniform("view", m_viewMatrix);
 	GetShader()->setMat4Uniform("projection", m_projMatrix);
+	
+
 }
 
 void Mesh::SetUniforms(std::string matName)

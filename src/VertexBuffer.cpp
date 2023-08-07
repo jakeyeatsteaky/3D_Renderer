@@ -2,24 +2,15 @@
 #include <string>
 #include <cstring>
 
-VertexBuffer::VertexBuffer(const float* vertices, const GLsizeiptr VertexBufferSize) :
-	m_vertices(new float[VertexBufferSize]),
-	m_verticesSize(VertexBufferSize)
+VertexBuffer::VertexBuffer(const std::vector<float>& vertices) :
+	m_vertices(new float[vertices.size()]),
+	m_verticesSize(vertices.size() * sizeof(float))
 {	
-	memcpy(m_vertices, vertices, (size_t)VertexBufferSize);
+	memcpy(m_vertices, vertices.data(), m_verticesSize);
 
 	glGenBuffers(1, &m_vboIdx);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboIdx);
 	glBufferData(GL_ARRAY_BUFFER, m_verticesSize, m_vertices, GL_STATIC_DRAW);
-}
-
-VertexBuffer::VertexBuffer(const VertexBuffer& other): 
-	m_vboIdx(other.m_vboIdx),
-	m_vertices(other.m_vertices),
-	m_verticesSize(other.m_verticesSize)
-{
-	// TODO: Implement copy constructure when use case arises
-	printf("COPY CONSTRUCTOR NOT IMPLEMENTED VERTEXBUFFFER\n");
 }
 
 VertexBuffer::~VertexBuffer()
@@ -36,6 +27,12 @@ void VertexBuffer::Bind(const float* vertices, const GLsizeiptr VertexBufferSize
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboIdx);
 	glBufferData(GL_ARRAY_BUFFER, m_verticesSize, m_vertices, GL_STATIC_DRAW);
 
+}
+
+void VertexBuffer::Bind() const
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_vboIdx);
+	glBufferData(GL_ARRAY_BUFFER, m_verticesSize, m_vertices, GL_STATIC_DRAW);
 }
 
 unsigned int VertexBuffer::GetIdx() 

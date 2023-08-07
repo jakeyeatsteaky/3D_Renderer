@@ -1,16 +1,16 @@
 #ifndef VERTEX_BUFFER_H
 #define VERTEX_BUFFER_H
 #include "GL/glew.h"
+#include <vector>
 
 class VertexBuffer
 {
 public:
-	VertexBuffer() = default;
-	VertexBuffer(const float* vertices, const GLsizeiptr VertexBufferSize);
-	VertexBuffer(const VertexBuffer& other);
+	VertexBuffer(const std::vector<float>& vertices);
 	~VertexBuffer();
 
 	void Bind(const float* vertices, const GLsizeiptr VertexBufferSize);
+	void Bind() const;
 	unsigned int GetIdx();
 	void ClearFromBinding();
 	void Destroy();

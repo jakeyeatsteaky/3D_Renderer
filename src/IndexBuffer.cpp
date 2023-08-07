@@ -2,24 +2,15 @@
 #include <string>
 #include <cstring>
 
-IndexBuffer::IndexBuffer(const unsigned int* indices, const GLsizeiptr indexBufferSize) :
-	m_indices(new unsigned int[indexBufferSize]),
-	m_indicesSize(indexBufferSize)
+IndexBuffer::IndexBuffer(const std::vector<unsigned>& indices) :
+	m_indices(new unsigned[indices.size()]),
+	m_indicesSize(indices.size() * sizeof(unsigned))
 {
-	memcpy(m_indices, indices, (size_t)indexBufferSize);
+	memcpy(m_indices, indices.data(), m_indicesSize);
 
 	glGenBuffers(1, &m_iboIdx);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboIdx);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indicesSize, m_indices, GL_STATIC_DRAW);
-}
-
-IndexBuffer::IndexBuffer(const IndexBuffer& other) :
-	m_iboIdx(other.m_iboIdx),
-	m_indices(other.m_indices),
-	m_indicesSize(other.m_indicesSize)
-{
-	// TODO: Implement copy constructure when use case arises
-	printf("COPY CONSTRUCTOR NOT IMPLEMENTED INDEX BUFFFER\n");
 }
 
 IndexBuffer::~IndexBuffer()
@@ -35,6 +26,12 @@ void IndexBuffer::Bind(const unsigned int* indices, const GLsizeiptr indexBuffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboIdx);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indicesSize, m_indices, GL_STATIC_DRAW);
 
+}
+
+void IndexBuffer::Bind() const
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboIdx);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indicesSize, m_indices, GL_STATIC_DRAW);
 }
 
 unsigned int IndexBuffer::GetIdx()

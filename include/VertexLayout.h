@@ -1,20 +1,20 @@
 #ifndef VERTEX_LAYOUT_H
 #define VERTEX_LAYOUT_H
 #include <cstdlib>
+#include "enumerations.h"
 
 class VertexLayout
 {
 public:
-    VertexLayout(size_t numAttributes) : m_numAttributes(numAttributes), m_attributeCount(0), m_readyForUse(false) {}
+    VertexLayout(Layout_Type vertexLayout) : m_layoutType(vertexLayout){}
     ~VertexLayout() = default;
 
-    void SetLayout(size_t index, size_t size, size_t stride, size_t offset);
+    void SetLayouts();
+    void SetLayout(size_t index, size_t size, size_t stride, size_t offset, bool intType = false);
     bool ReadyForUse();
 
 private:
-    size_t m_numAttributes;
-    size_t m_attributeCount;
-    bool m_readyForUse;
+    Layout_Type m_layoutType;
 };
 
 
