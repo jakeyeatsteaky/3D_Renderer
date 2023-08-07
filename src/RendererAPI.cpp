@@ -283,15 +283,32 @@ Renderer_Vulk::Renderer_Vulk() :
 	m_window(nullptr),
 	m_isInitialized(false)
 {
-
+	Init();
 }
 
 Renderer_Vulk::~Renderer_Vulk()
 {
 }
 
-void Renderer_Vulk::Init() const {
+void Renderer_Vulk::Init() const 
+{
+    // We initialize SDL and create a window with it. 
+	SDL_Init(SDL_INIT_VIDEO);
 
+	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+	
+    //create blank SDL window for our application
+	m_window = SDL_CreateWindow(
+		"Vulkan Engine", //window title
+		SDL_WINDOWPOS_UNDEFINED, //window position x (don't care)
+		SDL_WINDOWPOS_UNDEFINED, //window position y (don't care)
+		Renderer::WindowWidth, //window width in pixels
+		Renderer::WindowHeight, //window height in pixels
+		window_flags 
+	);
+	
+	//everything went fine
+	m_isInitialized = true;
 }
 
 void Renderer_Vulk::Render() const

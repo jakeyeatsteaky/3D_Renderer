@@ -10,7 +10,7 @@ class Renderer_DX;
 
 App::App() :
     m_isRunning(false),
-    m_rendererAPI(Renderer_API_Open_GL) 
+    m_rendererAPI(Renderer_API_Vulkan) 
 {
     if (m_rendererAPI == Renderer_API_Open_GL){
         std::cout << "YOU NEED TO WRITE THE SetupVertexLayouts function again because you accidentally deleted it :(\n";
