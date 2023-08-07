@@ -2,18 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
+            "name": "Launch Program",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/3DRenderer",
-            "preLaunchTask": "Build", // <-- Add this line
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build",
             "environment": [],
             "externalConsole": false,
+            "preLaunchTask": "build my project",
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

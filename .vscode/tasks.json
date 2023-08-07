@@ -1,58 +1,15 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-	  {
-		"type": "cppbuild",
-		"label": "C/C++: g++ build active file",
-		"command": "/usr/bin/g++",
-		"args": [
-		  "-fdiagnostics-color=always",
-		  "-Wall",
-		  "-Werror",
-		  "-std=c++17",
-		  "-I../include",
-		  "-I/usr/local/include",
-		  "../src/*.cpp",
-		  "-g",
-		  "${file}",
-		  "-o",
-		  "${workspaceFolder}/build/${fileBasenameNoExtension}",
-		  "-lGL",
-		  "-lGLEW",
-		  "-lSDL2"
-		],
-		"problemMatcher": ["$gcc"],
-		"group": {
-		  "kind": "build",
-		  "isDefault": true
-		},
-		"presentation": {
-			"reveal": "always",
-			"panel": "shared",
-			"focus": true
-		  },
-		  "options": {
-			"cwd": "${workspaceFolder}/build"   // Specify the build directory here
-		  },
-		"detail": "compiler: /usr/bin/g++"
-	  },
-
-	  {
-		"label": "Build",
-		"type": "shell",
-		"command": "make",
-		"args": [],
-		"group": "build",
-		"presentation": {
-		  "reveal": "always",
-		  "panel": "shared",
-		  "focus": true
-		},
-		"options": {
-		  "cwd": "${workspaceFolder}/build"   // Specify the build directory here
-		},
-		"problemMatcher": []
-	  }
-	]
-  }
-  
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build my project",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

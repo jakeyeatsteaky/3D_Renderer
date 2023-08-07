@@ -8,7 +8,7 @@ class Renderer_DX;
 
 App::App() :
     m_isRunning(false),
-    m_rendererAPI(Renderer_API_Vulkan) 
+    m_rendererAPI(Renderer_API_Open_GL) 
 {
     CreateRenderer();
 }

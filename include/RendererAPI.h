@@ -86,11 +86,12 @@ public:
 	virtual void SetupTextures() const override;
 	virtual bool InitSuccess() const override;
 	virtual void SetupVertexData() const override;
+	virtual void SetupVertexLayouts() const override;
 
 private:
 	mutable SDL_Window* m_window;
 	mutable bool m_isInitialized;
-	virtual void SetupVertexLayouts() const override;	
+
 };
 
 class Renderer_DX : public RendererInterface {
@@ -107,6 +108,7 @@ public:
 	virtual void SetupTextures() const override;
 	virtual void SetupVertexData() const override;
 	virtual void SetupVertexLayouts() const override;
+	virtual bool InitSuccess() const override;
 };
 
 

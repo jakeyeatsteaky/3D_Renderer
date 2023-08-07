@@ -4,7 +4,11 @@
 #define GLEW_STATIC 
 #include "GL/glew.h"
 #define STB_IMAGE_IMPLEMENTATION
+#ifdef __linux__
+#include "stb/stb_image.h"
+#else
 #include "stb_image.h"
+#endif
 
 Texture::Texture(const char* pathToTexture, Extension_Type exType)
 {

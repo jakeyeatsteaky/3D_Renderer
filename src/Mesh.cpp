@@ -7,12 +7,14 @@
 
 #include <fstream>
 
-Mesh::Mesh(
-		std::weak_ptr<VertexBuffer> vertexBuffer,
-		std::weak_ptr<IndexBuffer> indexBuffer,
-		std::weak_ptr<Shader> shaderProgram, 
-		std::weak_ptr<Texture> meshTexture, 
-		unsigned numAttributes):
+Mesh::Mesh(	std::weak_ptr<VertexBuffer> vertexBuffer,
+			std::weak_ptr<IndexBuffer> indexBuffer,
+			std::weak_ptr<Shader> shaderProgram, 
+			std::weak_ptr<Texture> meshTexture,
+			std::weak_ptr<VertexLayout> vertexLayout,
+			glm::vec3 translationVec,
+			bool useIdxBuf)
+:
 
 	m_modelMatrix(glm::mat4(1.0)),
 	m_viewMatrix(glm::mat4(1.0)),

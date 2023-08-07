@@ -8,7 +8,7 @@ Renderer_GL::Renderer_GL() : m_window(nullptr),
 							 m_renderer(nullptr),
 							 m_context(NULL)
 {
-
+	Init();
 }     
 
 Renderer_GL::~Renderer_GL()
@@ -230,6 +230,11 @@ void Renderer_GL::SetupVertexData() const
 
 }
 
+void Renderer_GL::SetupVertexLayouts() const
+{
+	
+}
+
 std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const
 {
 	return m_meshes;
@@ -268,6 +273,10 @@ void Renderer_GL::GeneratePrimitives() const
 
 }
 
+bool Renderer_GL::InitSuccess() const
+{
+	return true;
+}
 // =================================== RENDERER_VULKAN ===================================
 
 Renderer_Vulk::Renderer_Vulk() :
@@ -374,6 +383,11 @@ void Renderer_DX::SetupVertexLayouts() const
 
 void Renderer_DX::Input() const
 {
+}
+
+bool Renderer_DX::InitSuccess() const
+{
+	return true;
 }
 
 
