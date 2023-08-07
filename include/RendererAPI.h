@@ -45,6 +45,7 @@ public:
 	virtual void ClearScreen() const override;
 	virtual void SetupShaders() const override;
 	virtual void SetupTextures() const override;
+	virtual bool InitSuccess() const override;
 	std::vector<std::shared_ptr<Mesh>> GetMeshes() const;
 
 	//mutable Mesh* m_mesh;
@@ -74,6 +75,11 @@ public:
 	virtual void ClearScreen() const override;
 	virtual void SetupShaders() const override;
 	virtual void SetupTextures() const override;
+	virtual bool InitSuccess() const override;
+
+private:
+	mutable SDL_Window* m_window;
+	mutable bool m_isInitialized;
 };
 
 class Renderer_DX : public RendererInterface {
@@ -88,6 +94,7 @@ public:
 	virtual void ClearScreen() const override;
 	virtual void SetupShaders() const override;
 	virtual void SetupTextures() const override;
+	virtual bool InitSuccess() const override;
 };
 
 

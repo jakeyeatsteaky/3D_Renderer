@@ -8,7 +8,7 @@
 
 #include <fstream>
 
-Mesh::Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTexture, bool diff):
+Mesh::Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTexture):
 	m_modelMatrix(glm::mat4(1.0)),
 	m_viewMatrix(glm::mat4(1.0)),
 	m_projMatrix(glm::mat4(1.0)),

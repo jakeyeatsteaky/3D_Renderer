@@ -8,7 +8,7 @@ class Renderer_DX;
 
 App::App() :
     m_isRunning(false),
-    m_rendererAPI(Renderer_API_Open_GL) 
+    m_rendererAPI(Renderer_API_Vulkan) 
 {
     CreateRenderer();
 }
@@ -20,9 +20,13 @@ App::~App() {
 
 void App::Setup()
 {
-    SetIsRunning(true);
+    if (!m_renderer->InitSuccess())
+    {
+        std::cout << "Window creation failed\n";
+        return;
+    }
 
-    m_renderer->Init();
+    SetIsRunning(true);
 
     std::cout << "App successfully Set Up\n";
 }

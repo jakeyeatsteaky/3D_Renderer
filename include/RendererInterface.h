@@ -25,6 +25,7 @@ public:
 	virtual void ClearScreen() const = 0;
 	virtual void SetupShaders() const = 0;
 	virtual void SetupTextures() const = 0;
+	virtual bool InitSuccess() const = 0;
 
 
 private:

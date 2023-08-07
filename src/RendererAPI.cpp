@@ -8,7 +8,7 @@ Renderer_GL::Renderer_GL() :
 	m_renderer(nullptr),
 	m_context(NULL)
 {
-
+	Init();
 }     
 
 Renderer_GL::~Renderer_GL()
@@ -100,7 +100,9 @@ void Renderer_GL::OpenWindow() const {
 	}
 
 	// Enable glew experimental, this enables some more OpenGL extensions.
+#ifdef __linux__
 	glewExperimental = GL_TRUE;
+#endif
 	if (glewInit() != GLEW_OK)
 	{
 		std::cerr << "Error initializing glewExperimental\n";
@@ -132,6 +134,12 @@ void Renderer_GL::SetupTextures() const
 	m_textures.push_back(texture2);
 }
 
+bool Renderer_GL::InitSuccess() const
+{
+	std::cout << "yes" << std::endl;
+	return true;
+}
+
 std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const 
 {
 	return m_meshes;
@@ -143,7 +151,7 @@ std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const
 
 
 
-
+  
 
 
 
@@ -152,9 +160,11 @@ std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const
 
 // =================================== RENDERER_VULKAN ===================================
 
-Renderer_Vulk::Renderer_Vulk()
+Renderer_Vulk::Renderer_Vulk() :
+	m_window(nullptr),
+	m_isInitialized(false)
 {
-
+	Init();
 }
 
 Renderer_Vulk::~Renderer_Vulk()
@@ -163,7 +173,23 @@ Renderer_Vulk::~Renderer_Vulk()
 }
 
 void Renderer_Vulk::Init() const {
+	// We initialize SDL and create a window with it. 
+	SDL_Init(SDL_INIT_VIDEO);
 
+	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+	;
+
+	//create blank SDL window for our application
+	m_window = SDL_CreateWindow(
+		"Vulkan Engine", //window title
+		SDL_WINDOWPOS_UNDEFINED, //window position x (don't care)
+		SDL_WINDOWPOS_UNDEFINED, //window position y (don't care)
+		Renderer::WindowWidth,  //window width in pixels
+		Renderer::WindowHeight, //window height in pixels
+		window_flags);
+
+	//everything went fine
+	m_isInitialized = true;
 }
 
 void Renderer_Vulk::Render() const {
@@ -196,6 +222,11 @@ void Renderer_Vulk::SetupShaders() const
 void Renderer_Vulk::SetupTextures() const
 {
 
+}
+
+bool Renderer_Vulk::InitSuccess() const
+{
+	return m_isInitialized;
 }
 
 
@@ -245,6 +276,12 @@ void Renderer_DX::SetupTextures() const
 void Renderer_DX::Input() const
 {
 
+}
+
+bool Renderer_DX::InitSuccess() const
+{
+	std::cout << "yes" << std::endl;
+	return true;
 }
 
 

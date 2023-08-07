@@ -10,7 +10,7 @@ class Mesh
 {
 public:
 	// Apply the rule of five here - potentiall pass a Vertex Array by const reference, rvalue reference, etc
-	Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTexture, bool diff = false);
+	Mesh(std::weak_ptr<Shader> shaderProgram, std::weak_ptr<Texture> meshTexture);
 
 	Mesh(VertexArray&& vao, std::weak_ptr<Shader> shaderProgram) : m_vao(std::move(vao)), m_shaderProgram(shaderProgram) {}
 	~Mesh() = default;

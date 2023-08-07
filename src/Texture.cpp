@@ -4,7 +4,7 @@
 #define GLEW_STATIC 
 #include "GL/glew.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
+#include "stb_image.h"
 
 Texture::Texture(const char* pathToTexture, Extension_Type exType)
 {
@@ -22,8 +22,9 @@ Texture::Texture(const char* pathToTexture, Extension_Type exType)
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+#ifdef __linux__
 			glGenerateMipmap(GL_TEXTURE_2D);
-	
+#endif
 			stbi_image_free(data);
 		}
 		else
@@ -45,7 +46,9 @@ Texture::Texture(const char* pathToTexture, Extension_Type exType)
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+#ifdef __linux__
 			glGenerateMipmap(GL_TEXTURE_2D);
+#endif
 
 			stbi_image_free(data);
 		}
