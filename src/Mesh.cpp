@@ -47,7 +47,7 @@ Mesh::Mesh(	std::weak_ptr<VertexBuffer> vertexBuffer,
 
 	}
 	else {
-		std::shared_ptr<VertexBuffer> vbo = m_vbo.lock();
+		vbo = m_vbo.lock();
 		std::shared_ptr<VertexLayout> vlo = m_layout.lock();
 		if(vbo && vlo) { 
 			vbo->Bind();

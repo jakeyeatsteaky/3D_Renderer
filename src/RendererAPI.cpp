@@ -3,7 +3,13 @@
 #include <fstream>
 #include <cstring>
 
+#include <SDL2/SDL.h>
+#ifdef USING_VULKAN
+#include <SDL_vulkan.h>
+#endif
+
 // =================================== RENDERER_OPEN_GL ===================================
+#ifdef USING_GL
 Renderer_GL::Renderer_GL() : m_window(nullptr),
 							 m_renderer(nullptr),
 							 m_context(NULL)
@@ -242,7 +248,7 @@ std::vector<std::shared_ptr<Mesh>> Renderer_GL::GetMeshes() const
 
 void Renderer_GL::GeneratePrimitives() const
 {
-	const float PI = 3.14159265358979323846;
+	const double PI = 3.14159265358979323846;
 	const int numLatitude = 20;
 	const int numLongitude = 20;
 
@@ -277,6 +283,8 @@ bool Renderer_GL::InitSuccess() const
 {
 	return true;
 }
+
+#endif
 // =================================== RENDERER_VULKAN ===================================
 
 Renderer_Vulk::Renderer_Vulk() :
@@ -299,16 +307,25 @@ void Renderer_Vulk::Init() const
 	
     //create blank SDL window for our application
 	m_window = SDL_CreateWindow(
-		"Vulkan Engine", //window title
-		SDL_WINDOWPOS_UNDEFINED, //window position x (don't care)
-		SDL_WINDOWPOS_UNDEFINED, //window position y (don't care)
-		Renderer::WindowWidth, //window width in pixels
-		Renderer::WindowHeight, //window height in pixels
+		"3D Vulkan Renderer", 
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED, 
+		Renderer::WindowWidth, 
+		Renderer::WindowHeight, 
 		window_flags 
 	);
 	
 	//everything went fine
 	m_isInitialized = true;
+}
+
+void Renderer_Vulk::Cleanup()
+{
+	if (m_isInitialized)
+	{
+		SDL_DestroyWindow(m_window);
+	}
+	std::cout << "Sucessfully deleted SDL Window\n";
 }
 
 void Renderer_Vulk::Render() const

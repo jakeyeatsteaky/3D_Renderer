@@ -1,12 +1,17 @@
 #ifndef RENDERER_API_H
 #define RENDERER_API_H
 
+#define USING_VULKAN
 #include "RendererInterface.h"
 
+#if defined(USING_GL)
 #define GLEW_STATIC
 #include "GL/glew.h"
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#elif defined(USING_VULKAN)
+#include <vulkan/vulkan.h>
+#else
+#endif
 
 #include "enumerations.h"
 #include "Shaders.h"
@@ -16,6 +21,7 @@
 #include "IndexBuffer.h"
 #include "VertexLayout.h"
 #include "Mesh.h"
+
 
 namespace Renderer
 {
@@ -39,35 +45,36 @@ namespace Renderer
 class Renderer_GL : public RendererInterface {
 public:
 
-	Renderer_GL();
-	virtual ~Renderer_GL();
+	Renderer_GL() {}
+	virtual ~Renderer_GL() {}
 	
 	// RenderInterface virtual functions
-	virtual void Init() const override;
-	virtual void Input() const override;
-	virtual void Render() const override;
-	virtual void Update() override;
-	virtual void OpenWindow() const override;
-	virtual void ClearScreen() const override;
-	virtual void SetupShaders() const override;
-	virtual void SetupTextures() const override;
-	virtual bool InitSuccess() const override;
-	virtual void SetupVertexData() const override;
-	virtual void SetupVertexLayouts() const override;
-	void GeneratePrimitives() const;
+	virtual void Init() const override {}
+	virtual void Input() const override{}
+	virtual void Render() const override{}
+	virtual void Update() override{}
+	virtual void OpenWindow() const override{}
+	virtual void ClearScreen() const override{}
+	virtual void SetupShaders() const override{}
+	virtual void SetupTextures() const override{}
+	virtual bool InitSuccess() const override { return false; }
+	virtual void SetupVertexData() const override{}
+	virtual void SetupVertexLayouts() const override{}
+	void GeneratePrimitives() const {}
 	std::vector<std::shared_ptr<Mesh>> GetMeshes() const;
 
 private:
-
-	mutable SDL_Window* m_window;
-	mutable SDL_Renderer* m_renderer;
-	mutable SDL_GLContext m_context;
+#ifdef USING_GL
+	mutable struct SDL_Window* m_window;
+	mutable struct SDL_Renderer* m_renderer;
+	mutable struct SDL_GLContext m_context;
 	mutable std::vector<std::shared_ptr<VertexBuffer>> m_vertexBuffers;
 	mutable std::vector<std::shared_ptr<IndexBuffer>> m_indexBuffers;
 	mutable std::vector<std::shared_ptr<Mesh>> m_meshes;
 	mutable std::vector<std::shared_ptr<Shader>>m_shaders;
 	mutable std::vector<std::shared_ptr<Texture>> m_textures;
 	mutable std::vector<std::shared_ptr<VertexLayout>> m_vertexLayouts;
+#endif
 
 };
 
@@ -86,11 +93,14 @@ public:
 	virtual void SetupTextures() const override;
 	virtual bool InitSuccess() const override;
 	virtual void SetupVertexData() const override;
-	virtual void SetupVertexLayouts() const override;
+	virtual void SetupVertexLayouts() const override;  
+	void Cleanup();
 
 private:
-	mutable SDL_Window* m_window;
+	mutable struct SDL_Window* m_window;
 	mutable bool m_isInitialized;
+	mutable int m_frameNumber;
+	VkExtent2D m_windowExtent{ 1700, 900 };
 
 };
 
