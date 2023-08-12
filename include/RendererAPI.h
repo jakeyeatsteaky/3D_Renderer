@@ -49,7 +49,7 @@ public:
 	virtual ~Renderer_GL() {}
 	
 	// RenderInterface virtual functions
-	virtual void Init() const override {}
+	virtual void Init()  override {}
 	virtual void Input() const override{}
 	virtual void Render() const override{}
 	virtual void Update() override{}
@@ -61,6 +61,9 @@ public:
 	virtual void SetupVertexData() const override{}
 	virtual void SetupVertexLayouts() const override{}
 	void GeneratePrimitives() const {}
+	virtual void Cleanup() override {}
+
+
 	std::vector<std::shared_ptr<Mesh>> GetMeshes() const;
 
 private:
@@ -83,7 +86,7 @@ class Renderer_Vulk : public RendererInterface {
 public:
 	Renderer_Vulk();
 	virtual ~Renderer_Vulk();
-	virtual void Init() const override;
+	virtual void Init()  override; // intializes SDL windowing
 	virtual void Input() const override;
 	virtual void Render() const override;
 	virtual void Update() override;
@@ -94,7 +97,9 @@ public:
 	virtual bool InitSuccess() const override;
 	virtual void SetupVertexData() const override;
 	virtual void SetupVertexLayouts() const override;  
-	void Cleanup();
+	virtual void Cleanup() override;
+	void Init_Vulkan();
+	void Init_Swapchain();
 
 private:
 	mutable struct SDL_Window* m_window;
@@ -102,13 +107,26 @@ private:
 	mutable int m_frameNumber;
 	VkExtent2D m_windowExtent{ 1700, 900 };
 
+	// Core Init
+	VkInstance m_instance;
+	VkDebugUtilsMessengerEXT m_debugMessenger;
+	VkPhysicalDevice m_physicalDevice;
+	VkDevice m_device;
+	VkSurfaceKHR m_surface;
+
+	//SwapChain
+	VkSwapchainKHR m_swapchain;
+	VkFormat m_swapchainFormat; 
+	std::vector<VkImage> m_swapchainImages;
+	std::vector<VkImageView> m_swapchainImageViews;
+
 };
 
 class Renderer_DX : public RendererInterface {
 public:
 	Renderer_DX();
 	virtual ~Renderer_DX();
-	virtual void Init() const override;
+	virtual void Init() override;
 	virtual void Input() const override;
 	virtual void Render() const override;
 	virtual void Update() override;
@@ -119,6 +137,7 @@ public:
 	virtual void SetupVertexData() const override;
 	virtual void SetupVertexLayouts() const override;
 	virtual bool InitSuccess() const override;
+	virtual void Cleanup() override {}
 };
 
 

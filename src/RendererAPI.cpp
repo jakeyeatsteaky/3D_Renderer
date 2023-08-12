@@ -6,6 +6,18 @@
 #include <SDL2/SDL.h>
 #ifdef USING_VULKAN
 #include <SDL_vulkan.h>
+#include "VkBootstrap.h"
+#define VK_CHECK(x)														\
+	do																	\
+	{																	\
+		VkResult err = x;												\
+		if (err)														\
+		{																\
+			std::cout <<"Detected Vulkan error: " << err << std::endl;	\
+			abort();													\
+		}																\
+	} while (0)
+
 #endif
 
 // =================================== RENDERER_OPEN_GL ===================================
@@ -292,13 +304,15 @@ Renderer_Vulk::Renderer_Vulk() :
 	m_isInitialized(false)
 {
 	Init();
+	
 }
 
 Renderer_Vulk::~Renderer_Vulk()
 {
+	
 }
 
-void Renderer_Vulk::Init() const 
+void Renderer_Vulk::Init()  
 {
     // We initialize SDL and create a window with it. 
 	SDL_Init(SDL_INIT_VIDEO);
@@ -317,13 +331,90 @@ void Renderer_Vulk::Init() const
 	
 	//everything went fine
 	m_isInitialized = true;
+
+	Init_Vulkan();
+	Init_Swapchain();
+
+}
+
+void Renderer_Vulk::Init_Vulkan()
+{
+	vkb::InstanceBuilder builder;
+
+	auto inst_ret = builder.set_app_name("3D Vulkan Engine")
+		.request_validation_layers(true)
+		.require_api_version(1, 1, 0)
+		.use_default_debug_messenger()
+		.build();
+
+	// init a vkinstance object from the builder, and use values from it for member variables
+	vkb::Instance vkb_inst = inst_ret.value();
+	m_instance = vkb_inst.instance;
+	m_debugMessenger = vkb_inst.debug_messenger;
+
+	SDL_Vulkan_CreateSurface(m_window, m_instance, &m_surface);
+	vkb::PhysicalDeviceSelector selector { vkb_inst };
+	vkb::PhysicalDevice physicalDevice = selector
+		.set_minimum_version(1, 1)
+		.set_surface(m_surface)
+		.select()
+		.value();
+
+	vkb::DeviceBuilder deviceBuilder{ physicalDevice };
+	vkb::Device vkbDevice = deviceBuilder.build().value();
+	m_device = vkbDevice.device;
+	m_physicalDevice = physicalDevice.physical_device;
+
+	std::cout << "Choosing Physical Device: " << physicalDevice.properties.deviceName << std::endl;
+
+}
+
+void Renderer_Vulk::Init_Swapchain()
+{
+	vkb::SwapchainBuilder scBuilder{ m_physicalDevice, m_device, m_surface };
+
+	vkb::Swapchain vkbSwapchain = scBuilder
+		.use_default_format_selection()
+		.set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+		.set_desired_extent(Renderer::WindowWidth, Renderer::WindowHeight) // If window is resized, swapchain needs rebuilding
+		.build()
+		.value();
+
+	m_swapchain = vkbSwapchain.swapchain;
+	m_swapchainImages = vkbSwapchain.get_images().value();
+	m_swapchainImageViews = vkbSwapchain.get_image_views().value();
+	m_swapchainFormat = vkbSwapchain.image_format;
 }
 
 void Renderer_Vulk::Cleanup()
 {
+
+	//order of creation -> SDL_Window, Instance, Surface, Device, Swapchain
 	if (m_isInitialized)
 	{
+		// swapchain
+		vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+		for (size_t i = 0; i < m_swapchainImageViews.size(); ++i)
+		{
+			vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
+			// no need to destroy images because images are owned and destroyed in the swapchain
+		}
+
+		// device
+		vkDestroyDevice(m_device, nullptr);
+
+		// surface
+		vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+
+		// util debug
+		vkb::destroy_debug_utils_messenger(m_instance, m_debugMessenger);
+
+		// Instance 
+		vkDestroyInstance(m_instance, nullptr);
+		
+		// SDL Window
 		SDL_DestroyWindow(m_window);
+
 	}
 	std::cout << "Sucessfully deleted SDL Window\n";
 }
@@ -379,7 +470,7 @@ Renderer_DX::~Renderer_DX()
 {
 }
 
-void Renderer_DX::Init() const
+void Renderer_DX::Init() 
 {
 }
 

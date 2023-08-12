@@ -75,6 +75,7 @@ void App::Render()
 void App::Destroy()
 {
     // Deallocate resources to subsystems 
+    m_renderer->Cleanup();
     std::cout << "App successfully destroyed\n";
 }
 

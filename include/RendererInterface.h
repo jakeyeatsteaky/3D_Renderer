@@ -17,7 +17,7 @@ public:
 
 	static std::unique_ptr<RendererInterface> MakeRenderer(RENDERER_API api);
 
-	virtual void Init() const = 0;
+	virtual void Init() = 0;
 	virtual void Input() const = 0;
 	virtual void Render() const = 0;
 	virtual void Update() = 0;
@@ -28,6 +28,7 @@ public:
 	virtual bool InitSuccess() const = 0;
 	virtual void SetupVertexData() const = 0;
 	virtual void SetupVertexLayouts() const = 0;
+	virtual void Cleanup() = 0;
 
 private:
 	std::unordered_map<std::string, Mesh*> m_meshMap;

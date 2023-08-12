@@ -4,16 +4,21 @@ project(3DRenderer)
 set(CMAKE_CXX_STANDARD 17)
 message(STATUS "Project source dir: ${PROJECT_SOURCE_DIR}")
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+endif()
+
 if(MSVC)
-    add_compile_options(/W4 /WX)
+    add_compile_options(/W4 /WX /Zi)
 else()
     add_compile_options(-fdiagnostics-color=always -Wall -Werror -std=c++17 -g)
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/thirdparty_src/include)
 include_directories("C:/Program Files/stb")
 
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES "src/*.cpp" "thirdparty_src/src/*.cpp")
 add_executable(3DRenderer main.cpp ${SOURCES})
 
 if(WIN32)
