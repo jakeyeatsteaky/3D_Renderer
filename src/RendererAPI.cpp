@@ -326,6 +326,8 @@ void Renderer_Vulk::Init()
 	Init_Vulkan();
 	Init_Swapchain();
 	Init_Commands();
+	Init_Default_RenderPass();
+	Init_Framebuffers();
 }
 
 void Renderer_Vulk::Init_Vulkan()
@@ -393,10 +395,59 @@ void Renderer_Vulk::Init_Commands()
 
 }
 
+void Renderer_Vulk::Init_Default_RenderPass()
+{
+	VkAttachmentDescription colorAttachment = {};
+	colorAttachment.format = m_swapchainFormat;
+	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; // after render pass, image has to be in a layout ready for display
+
+	// Above was defining the main image target.  Now add a subpass that will render into it
+	VkAttachmentReference colorRef = {  };
+	colorRef.attachment = 0;
+	colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription subpass = {};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorRef;
+
+	VkRenderPassCreateInfo renderPassInfo = vk_util::cmd_renderpass_create_info(&colorAttachment, &subpass);
+
+	VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_renderPass), "Create Render Pass");
+}
+
+void Renderer_Vulk::Init_Framebuffers()
+{
+	std::vector<std::string> text = {
+		"Create Frame Buffer #1",
+		"Create Frame Buffer #2",
+		"Create Frame Buffer #3"
+	};
+
+	VkFramebufferCreateInfo fb_info = vk_util::cmd_framebuffer_create_info(m_renderPass);
+
+	// grab number of images in the swapchain
+	const size_t swapchainImageCount = m_swapchainImages.size();
+	m_frameBuffers = std::vector<VkFramebuffer>(swapchainImageCount);
+
+	// create framebuffers for each swapchain image view
+	for (int i = 0; i < swapchainImageCount; ++i)
+	{
+		fb_info.pAttachments = &m_swapchainImageViews[i];
+		VK_CHECK(vkCreateFramebuffer(m_device, &fb_info, nullptr, &m_frameBuffers[i]), text[i]);
+	}
+}
+
 void Renderer_Vulk::Cleanup()
 {
 
-	//order of creation -> SDL_Window, Instance, Surface, Device, Swapchain, Command Pool
+	//order of creation -> SDL_Window, Instance, Surface, Device, Swapchain, Render Pass, Command Pool, render pass 
 	if (m_isInitialized)
 	{
 		// command pool
@@ -404,10 +455,16 @@ void Renderer_Vulk::Cleanup()
 
 		// swapchain
 		vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+
+		// render pass 
+		vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+
+		// image views and framebuffers should be done together
 		for (size_t i = 0; i < m_swapchainImageViews.size(); ++i)
 		{
 			vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
 			// no need to destroy images because images are owned and destroyed in the swapchain
+			vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
 		}
 
 		// device

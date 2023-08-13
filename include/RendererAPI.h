@@ -101,6 +101,8 @@ public:
 	void Init_Vulkan();
 	void Init_Swapchain();
 	void Init_Commands();
+	void Init_Default_RenderPass();
+	void Init_Framebuffers();
 
 private:
 	mutable struct SDL_Window* m_window;
@@ -126,6 +128,10 @@ private:
 	VkCommandBuffer m_commandBuffer;
 	VkQueue m_graphicsQueue;
 	uint32_t m_graphicsQueueFamilyIdx;
+
+	// Render Pass
+	VkRenderPass m_renderPass;
+	std::vector<VkFramebuffer> m_frameBuffers;
 
 };
 
