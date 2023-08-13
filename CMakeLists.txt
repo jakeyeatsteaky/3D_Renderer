@@ -23,6 +23,7 @@ add_executable(3DRenderer main.cpp ${SOURCES})
 
 if(WIN32)
     file(GLOB_RECURSE HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/*.h")
+    file(GLOB_RECURSE HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/*.hpp")
     target_sources(3DRenderer PRIVATE ${HEADER_LIST})
 
     set(SDL2_DIR "C:/Program Files/SDL2")

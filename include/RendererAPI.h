@@ -100,6 +100,7 @@ public:
 	virtual void Cleanup() override;
 	void Init_Vulkan();
 	void Init_Swapchain();
+	void Init_Commands();
 
 private:
 	mutable struct SDL_Window* m_window;
@@ -119,6 +120,12 @@ private:
 	VkFormat m_swapchainFormat; 
 	std::vector<VkImage> m_swapchainImages;
 	std::vector<VkImageView> m_swapchainImageViews;
+
+	// Commands
+	VkCommandPool m_commandPool;
+	VkCommandBuffer m_commandBuffer;
+	VkQueue m_graphicsQueue;
+	uint32_t m_graphicsQueueFamilyIdx;
 
 };
 

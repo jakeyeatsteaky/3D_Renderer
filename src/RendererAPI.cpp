@@ -7,16 +7,7 @@
 #ifdef USING_VULKAN
 #include <SDL_vulkan.h>
 #include "VkBootstrap.h"
-#define VK_CHECK(x)														\
-	do																	\
-	{																	\
-		VkResult err = x;												\
-		if (err)														\
-		{																\
-			std::cout <<"Detected Vulkan error: " << err << std::endl;	\
-			abort();													\
-		}																\
-	} while (0)
+#include "VulkanUtil.hpp"
 
 #endif
 
@@ -334,7 +325,7 @@ void Renderer_Vulk::Init()
 
 	Init_Vulkan();
 	Init_Swapchain();
-
+	Init_Commands();
 }
 
 void Renderer_Vulk::Init_Vulkan()
@@ -365,8 +356,12 @@ void Renderer_Vulk::Init_Vulkan()
 	m_device = vkbDevice.device;
 	m_physicalDevice = physicalDevice.physical_device;
 
-	std::cout << "Choosing Physical Device: " << physicalDevice.properties.deviceName << std::endl;
+	// Queue
+	m_graphicsQueueFamilyIdx = vkbDevice.get_queue_index(vkb::QueueType::graphics).value();
+	m_graphicsQueue = vkbDevice.get_queue(vkb::QueueType::graphics).value();
 
+	std::cout << "Number of Queue families: " << vkbDevice.queue_families.size() << std::endl;
+	std::cout << "Choosing Physical Device: " << physicalDevice.properties.deviceName << std::endl;
 }
 
 void Renderer_Vulk::Init_Swapchain()
@@ -386,12 +381,27 @@ void Renderer_Vulk::Init_Swapchain()
 	m_swapchainFormat = vkbSwapchain.image_format;
 }
 
+void Renderer_Vulk::Init_Commands()
+{
+	VkCommandPoolCreateInfo commandPoolInfo = vk_util::cmd_pool_create_info(m_graphicsQueueFamilyIdx);
+
+	VK_CHECK(vkCreateCommandPool(m_device, &commandPoolInfo, nullptr, &m_commandPool), "Create Command Pool");
+
+	VkCommandBufferAllocateInfo cmdBufAllocInfo = vk_util::cmd_buf_alloc_info(m_commandPool);
+
+	VK_CHECK(vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, &m_commandBuffer), "Allocate Command Buffer");
+
+}
+
 void Renderer_Vulk::Cleanup()
 {
 
-	//order of creation -> SDL_Window, Instance, Surface, Device, Swapchain
+	//order of creation -> SDL_Window, Instance, Surface, Device, Swapchain, Command Pool
 	if (m_isInitialized)
 	{
+		// command pool
+		vkDestroyCommandPool(m_device, m_commandPool, nullptr);
+
 		// swapchain
 		vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
 		for (size_t i = 0; i < m_swapchainImageViews.size(); ++i)
