@@ -320,14 +320,16 @@ void Renderer_Vulk::Init()
 		window_flags 
 	);
 	
-	//everything went fine
-	m_isInitialized = true;
-
 	Init_Vulkan();
 	Init_Swapchain();
 	Init_Commands();
 	Init_Default_RenderPass();
 	Init_Framebuffers();
+	Init_Sync();
+
+	//everything went fine
+	m_isInitialized = true;
+
 }
 
 void Renderer_Vulk::Init_Vulkan()
@@ -444,6 +446,31 @@ void Renderer_Vulk::Init_Framebuffers()
 	}
 }
 
+void Renderer_Vulk::Init_Sync()
+{
+	VkFenceCreateInfo fenceCreateInfo = vk_util::cmd_fence_create_info();
+	VkSemaphoreCreateInfo semaphoreCreateInfo_render = vk_util::cmd_semaphore_create_info();
+	VkSemaphoreCreateInfo semaphoreCreateInfo_present = vk_util::cmd_semaphore_create_info();
+
+	VK_CHECK(vkCreateFence(m_device, &fenceCreateInfo, nullptr, &m_renderFence), "Create Fence");
+	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_present, nullptr, &m_presentSemaphore), "Create Present Semaphore");
+	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_render, nullptr, &m_renderSemaphore), "Create Render Semaphore");
+
+
+}
+
+void Renderer_Vulk::Draw() const
+{
+	// wait until GPU has finished work
+	VK_CHECK(vkWaitForFences(m_device, 1, &m_renderFence, true, 1000000000), "Wait for Fences");
+	VK_CHECK(vkResetFences(m_device, 1, &m_renderFence), "Reset Fences");
+
+	uint32_t swapchainImageidx;
+	VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr, &swapchainImageidx), "Acquire SC Idx");
+
+
+}
+
 void Renderer_Vulk::Cleanup()
 {
 
@@ -488,6 +515,7 @@ void Renderer_Vulk::Cleanup()
 
 void Renderer_Vulk::Render() const
 {
+	Draw();
 }
 
 void Renderer_Vulk::Update()

@@ -35,6 +35,10 @@ namespace vk_util
 														uint32_t windowHeight = Renderer::WindowHeight,
 														uint32_t attachmentCount = 1,
 														uint32_t layers = 1);
+
+	VkFenceCreateInfo cmd_fence_create_info(VkFlags flags = VK_FENCE_CREATE_SIGNALED_BIT);
+
+	VkSemaphoreCreateInfo cmd_semaphore_create_info(VkFlags flags = 0);
 }
 
 

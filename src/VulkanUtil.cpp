@@ -23,10 +23,11 @@ VkCommandBufferAllocateInfo vk_util::cmd_buf_alloc_info(VkCommandPool pool, uint
 	return info;
 }
 
-VkRenderPassCreateInfo vk_util::cmd_renderpass_create_info(VkAttachmentDescription* pColorAttachment,
-														   VkSubpassDescription* pSubpasses,
-														   uint32_t attachmentCount /*= 1*/,
-														   uint32_t subpassCount /*= 1*/)
+VkRenderPassCreateInfo vk_util::cmd_renderpass_create_info(
+	VkAttachmentDescription* pColorAttachment,
+	VkSubpassDescription* pSubpasses,
+	uint32_t attachmentCount /*= 1*/,
+	uint32_t subpassCount /*= 1*/)
 {
 	VkRenderPassCreateInfo info = {};
 	info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -38,11 +39,12 @@ VkRenderPassCreateInfo vk_util::cmd_renderpass_create_info(VkAttachmentDescripti
 	return info;
 }
 
-VkFramebufferCreateInfo vk_util::cmd_framebuffer_create_info(VkRenderPass renderPass,
-															 uint32_t windowWidth /*= Renderer::WindowWidth*/,
-															 uint32_t windowHeight /*= Renderer::WindowHeight*/,
-															 uint32_t attachmentCount /*= 1*/,
-															 uint32_t layers /*= 1*/)
+VkFramebufferCreateInfo vk_util::cmd_framebuffer_create_info(
+	VkRenderPass renderPass,
+	uint32_t windowWidth /*= Renderer::WindowWidth*/,
+	uint32_t windowHeight /*= Renderer::WindowHeight*/,
+	uint32_t attachmentCount /*= 1*/,
+	uint32_t layers /*= 1*/)
 {
 	VkFramebufferCreateInfo info = {};
 	info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -53,6 +55,27 @@ VkFramebufferCreateInfo vk_util::cmd_framebuffer_create_info(VkRenderPass render
 	info.width = windowWidth;
 	info.height = windowHeight;
 	info.layers = layers;
+
+	return info;
+}
+
+
+VkFenceCreateInfo vk_util::cmd_fence_create_info(VkFlags flags /*= VK_FENCE_CREATE_SIGNALED_BIT*/)
+{
+	VkFenceCreateInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	info.pNext = nullptr;
+	info.flags = flags;
+
+	return info;
+}
+
+VkSemaphoreCreateInfo vk_util::cmd_semaphore_create_info(VkFlags flags /*= 0*/)
+{
+	VkSemaphoreCreateInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	info.pNext = nullptr;
+	info.flags = flags;
 
 	return info;
 }

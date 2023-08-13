@@ -103,6 +103,8 @@ public:
 	void Init_Commands();
 	void Init_Default_RenderPass();
 	void Init_Framebuffers();
+	void Init_Sync();
+	void Draw() const ;
 
 private:
 	mutable struct SDL_Window* m_window;
@@ -132,6 +134,11 @@ private:
 	// Render Pass
 	VkRenderPass m_renderPass;
 	std::vector<VkFramebuffer> m_frameBuffers;
+
+	// Sync
+	VkSemaphore m_presentSemaphore;
+	VkSemaphore m_renderSemaphore;
+	VkFence m_renderFence;
 
 };
 
