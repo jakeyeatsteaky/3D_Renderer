@@ -387,7 +387,9 @@ void Renderer_Vulk::Init_Swapchain()
 
 void Renderer_Vulk::Init_Commands()
 {
-	VkCommandPoolCreateInfo commandPoolInfo = vk_util::cmd_pool_create_info(m_graphicsQueueFamilyIdx);
+	VkCommandPoolCreateInfo commandPoolInfo = vk_util::cmd_pool_create_info(
+		m_graphicsQueueFamilyIdx, 
+		VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 
 	VK_CHECK(vkCreateCommandPool(m_device, &commandPoolInfo, nullptr, &m_commandPool), "Create Command Pool");
 
@@ -465,18 +467,79 @@ void Renderer_Vulk::Draw() const
 	VK_CHECK(vkWaitForFences(m_device, 1, &m_renderFence, true, 1000000000), "Wait for Fences");
 	VK_CHECK(vkResetFences(m_device, 1, &m_renderFence), "Reset Fences");
 
+	// Request an image from the swapchain and use a presentSemaphore which signals once the image is available for rendering
 	uint32_t swapchainImageidx;
 	VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr, &swapchainImageidx), "Acquire SC Idx");
+	
+	// Reset the command buffer and begin commands
+	VK_CHECK(vkResetCommandBuffer(m_commandBuffer, 0), "Reset Command Buffer");
 
+	VkCommandBuffer cmd = m_commandBuffer;
+	VkCommandBufferBeginInfo cmdBufBeginInfo = vk_util::cmd_buf_begin_info(nullptr, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBufBeginInfo), "Begin Command Buffer");
+
+	// Create a fancy clear color
+	VkClearValue val;
+	float flash = abs(sin(m_frameNumber / 120.f));
+	val.color = { {0.f, 0.f, flash, 1.f } }; 
+
+	// Start main renderpass
+	VkExtent2D extent = { Renderer::WindowWidth, Renderer::WindowHeight };
+	VkRenderPassBeginInfo renderPassBeginInfo = vk_util::cmd_renderpass_begin_info(m_renderPass, extent, m_frameBuffers[swapchainImageidx], &val);
+
+	vkCmdBeginRenderPass(m_commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+	// RENDERING COMMANDS GO HERE
+
+	vkCmdEndRenderPass(m_commandBuffer);
+
+	VK_CHECK(vkEndCommandBuffer(m_commandBuffer), "End Command Buffer");
+
+	// Execute commands by submitting them to the GPU
+	// we are waiting on the PresentSemaphore (so we know the swapchain is ready)
+	// we will signal the RenderSemaphore so signal that the rendering has finished
+
+	VkSubmitInfo submitInfo = vk_util::cmd_submit_info(
+		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		1,
+		&const_cast<VkSemaphore>(m_presentSemaphore),
+		1,
+		&const_cast<VkSemaphore>(m_renderSemaphore),
+		1,
+		&const_cast<VkCommandBuffer>(m_commandBuffer));
+
+	VK_CHECK(vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_renderFence), "Queue Submission");
+
+	VkPresentInfoKHR presentInfo = vk_util::cmd_present_info(
+		&const_cast<VkSwapchainKHR>(m_swapchain),
+		1,
+		&const_cast<VkSemaphore>(m_renderSemaphore),
+		1,
+		&swapchainImageidx);
+
+	VK_CHECK(vkQueuePresentKHR(m_graphicsQueue, &presentInfo), "Queue Presentation");
+
+	m_frameNumber++;
 
 }
 
 void Renderer_Vulk::Cleanup()
 {
 
-	//order of creation -> SDL_Window, Instance, Surface, Device, Swapchain, Render Pass, Command Pool, render pass 
+	//order of creation -> SDL_Window, Instance, Surface, Device, Swapchain, Render Pass, Command Pool, Fence, Semaphore, CommandBuffer
 	if (m_isInitialized)
 	{
+		// Wait for commands to be in a destroyable state
+		vkDeviceWaitIdle(m_device);
+
+		//Semaphore
+		vkDestroySemaphore(m_device, m_presentSemaphore, nullptr);
+		vkDestroySemaphore(m_device, m_renderSemaphore, nullptr);
+
+		// Fence
+		vkDestroyFence(m_device, m_renderFence, nullptr);
+
 		// command pool
 		vkDestroyCommandPool(m_device, m_commandPool, nullptr);
 

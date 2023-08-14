@@ -79,3 +79,82 @@ VkSemaphoreCreateInfo vk_util::cmd_semaphore_create_info(VkFlags flags /*= 0*/)
 
 	return info;
 }
+
+VkCommandBufferBeginInfo vk_util::cmd_buf_begin_info(
+	VkCommandBufferInheritanceInfo* inheritanceInfo,
+	VkFlags flags)
+{
+	VkCommandBufferBeginInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	info.pNext = nullptr;
+	info.pInheritanceInfo = inheritanceInfo;
+	info.flags = flags;
+
+	return info;
+}
+
+VkRenderPassBeginInfo vk_util::cmd_renderpass_begin_info(
+	VkRenderPass renderPass,
+	VkExtent2D extent,
+	VkFramebuffer framebuffer,
+	VkClearValue* pClearValue,
+	uint32_t offsetX /*= 0*/,
+	uint32_t offsetY /*= 0*/)
+{
+	VkRenderPassBeginInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	info.pNext = nullptr;
+	info.renderPass = renderPass;
+	info.renderArea.offset.x = offsetX;
+	info.renderArea.offset.y = offsetY;
+	info.renderArea.extent = extent;
+	info.framebuffer = framebuffer;
+
+	info.clearValueCount = 1;
+	info.pClearValues = pClearValue;
+
+	return info;
+}
+
+VkSubmitInfo vk_util::cmd_submit_info(
+	VkPipelineStageFlags waitStage,
+	uint32_t waitSemaphoreCount,
+	VkSemaphore* waitSemaphore,
+	uint32_t signalSemaphoreCount,
+	VkSemaphore* signalSemaphore,
+	uint32_t commandBufferCount,
+	VkCommandBuffer* pCmdBuf)
+{
+	VkSubmitInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	info.pNext = nullptr;
+	info.pWaitDstStageMask = &waitStage;
+	info.waitSemaphoreCount = waitSemaphoreCount;
+	info.pWaitSemaphores = waitSemaphore;
+	info.signalSemaphoreCount = signalSemaphoreCount;
+	info.pSignalSemaphores = signalSemaphore;
+	info.commandBufferCount = commandBufferCount;
+	info.pCommandBuffers = pCmdBuf;
+
+	return info;
+}
+
+VkPresentInfoKHR vk_util::cmd_present_info(
+	VkSwapchainKHR* swapchain,
+	uint32_t swapchainCount,
+	VkSemaphore* waitSemaphore,
+	uint32_t semaphoreCount,
+	uint32_t* swapchainImageIdx)
+{
+	VkPresentInfoKHR info = {};
+	info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	info.pNext = nullptr;
+
+	info.pSwapchains = swapchain;
+	info.swapchainCount = swapchainCount;
+	info.pWaitSemaphores = waitSemaphore;
+	info.waitSemaphoreCount = semaphoreCount;
+	info.pImageIndices = swapchainImageIdx;
+
+	return info;
+}

@@ -39,7 +39,36 @@ namespace vk_util
 	VkFenceCreateInfo cmd_fence_create_info(VkFlags flags = VK_FENCE_CREATE_SIGNALED_BIT);
 
 	VkSemaphoreCreateInfo cmd_semaphore_create_info(VkFlags flags = 0);
+
+	VkCommandBufferBeginInfo cmd_buf_begin_info(VkCommandBufferInheritanceInfo* inheritanceInfo, VkFlags flags);
+
+	VkRenderPassBeginInfo cmd_renderpass_begin_info(
+		VkRenderPass renderPass,
+		VkExtent2D extent,
+		VkFramebuffer framebuffer,
+		VkClearValue* pClearValue,
+		uint32_t offsetX = 0,
+		uint32_t offsetY = 0);
+
+	VkSubmitInfo cmd_submit_info(
+		VkPipelineStageFlags waitStage,
+		uint32_t waitSemaphoreCount,
+		VkSemaphore* waitSemaphore,
+		uint32_t signalSemaphoreCount,
+		VkSemaphore* signalSemaphore,
+		uint32_t commandBufferCount,
+		VkCommandBuffer* pCmdBuf);
+
+	VkPresentInfoKHR cmd_present_info(
+		VkSwapchainKHR* swapchain,
+		uint32_t swapchainCount,
+		VkSemaphore* waitSemaphore,
+		uint32_t semaphoreCount,
+		uint32_t* swapchainImageIdx);
 }
+
+
+
 
 
 #endif
