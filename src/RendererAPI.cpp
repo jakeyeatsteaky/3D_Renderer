@@ -391,11 +391,11 @@ void Renderer_Vulk::Init_Commands()
 		m_graphicsQueueFamilyIdx, 
 		VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 
-	VK_CHECK(vkCreateCommandPool(m_device, &commandPoolInfo, nullptr, &m_commandPool), "Create Command Pool");
+	VK_CHECK(vkCreateCommandPool(m_device, &commandPoolInfo, nullptr, &m_commandPool), "Create Command Pool", true);
 
 	VkCommandBufferAllocateInfo cmdBufAllocInfo = vk_util::cmd_buf_alloc_info(m_commandPool);
 
-	VK_CHECK(vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, &m_commandBuffer), "Allocate Command Buffer");
+	VK_CHECK(vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, &m_commandBuffer), "Allocate Command Buffer", true);
 
 }
 
@@ -423,7 +423,7 @@ void Renderer_Vulk::Init_Default_RenderPass()
 
 	VkRenderPassCreateInfo renderPassInfo = vk_util::cmd_renderpass_create_info(&colorAttachment, &subpass);
 
-	VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_renderPass), "Create Render Pass");
+	VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_renderPass), "Create Render Pass", true);
 }
 
 void Renderer_Vulk::Init_Framebuffers()
@@ -444,7 +444,7 @@ void Renderer_Vulk::Init_Framebuffers()
 	for (int i = 0; i < swapchainImageCount; ++i)
 	{
 		fb_info.pAttachments = &m_swapchainImageViews[i];
-		VK_CHECK(vkCreateFramebuffer(m_device, &fb_info, nullptr, &m_frameBuffers[i]), text[i]);
+		VK_CHECK(vkCreateFramebuffer(m_device, &fb_info, nullptr, &m_frameBuffers[i]), text[i], true);
 	}
 }
 
@@ -454,9 +454,9 @@ void Renderer_Vulk::Init_Sync()
 	VkSemaphoreCreateInfo semaphoreCreateInfo_render = vk_util::cmd_semaphore_create_info();
 	VkSemaphoreCreateInfo semaphoreCreateInfo_present = vk_util::cmd_semaphore_create_info();
 
-	VK_CHECK(vkCreateFence(m_device, &fenceCreateInfo, nullptr, &m_renderFence), "Create Fence");
-	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_present, nullptr, &m_presentSemaphore), "Create Present Semaphore");
-	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_render, nullptr, &m_renderSemaphore), "Create Render Semaphore");
+	VK_CHECK(vkCreateFence(m_device, &fenceCreateInfo, nullptr, &m_renderFence), "Create Fence", true);
+	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_present, nullptr, &m_presentSemaphore), "Create Present Semaphore", true);
+	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_render, nullptr, &m_renderSemaphore), "Create Render Semaphore", true);
 
 
 }
@@ -464,20 +464,20 @@ void Renderer_Vulk::Init_Sync()
 void Renderer_Vulk::Draw() const
 {
 	// wait until GPU has finished work
-	VK_CHECK(vkWaitForFences(m_device, 1, &m_renderFence, true, 1000000000), "Wait for Fences");
-	VK_CHECK(vkResetFences(m_device, 1, &m_renderFence), "Reset Fences");
+	VK_CHECK(vkWaitForFences(m_device, 1, &m_renderFence, true, 1000000000), "Wait for Fences", false);
+	VK_CHECK(vkResetFences(m_device, 1, &m_renderFence), "Reset Fences", false);
 
 	// Request an image from the swapchain and use a presentSemaphore which signals once the image is available for rendering
 	uint32_t swapchainImageidx;
-	VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr, &swapchainImageidx), "Acquire SC Idx");
+	VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr, &swapchainImageidx), "Acquire SC Idx", false);
 	
 	// Reset the command buffer and begin commands
-	VK_CHECK(vkResetCommandBuffer(m_commandBuffer, 0), "Reset Command Buffer");
+	VK_CHECK(vkResetCommandBuffer(m_commandBuffer, 0), "Reset Command Buffer", false);
 
 	VkCommandBuffer cmd = m_commandBuffer;
 	VkCommandBufferBeginInfo cmdBufBeginInfo = vk_util::cmd_buf_begin_info(nullptr, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBufBeginInfo), "Begin Command Buffer");
+	VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBufBeginInfo), "Begin Command Buffer", false);
 
 	// Create a fancy clear color
 	VkClearValue val;
@@ -494,7 +494,7 @@ void Renderer_Vulk::Draw() const
 
 	vkCmdEndRenderPass(m_commandBuffer);
 
-	VK_CHECK(vkEndCommandBuffer(m_commandBuffer), "End Command Buffer");
+	VK_CHECK(vkEndCommandBuffer(m_commandBuffer), "End Command Buffer", false);
 
 	// Execute commands by submitting them to the GPU
 	// we are waiting on the PresentSemaphore (so we know the swapchain is ready)
@@ -509,7 +509,7 @@ void Renderer_Vulk::Draw() const
 		1,
 		&const_cast<VkCommandBuffer>(m_commandBuffer));
 
-	VK_CHECK(vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_renderFence), "Queue Submission");
+	VK_CHECK(vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_renderFence), "Queue Submission", false);
 
 	VkPresentInfoKHR presentInfo = vk_util::cmd_present_info(
 		&const_cast<VkSwapchainKHR>(m_swapchain),
@@ -518,7 +518,7 @@ void Renderer_Vulk::Draw() const
 		1,
 		&swapchainImageidx);
 
-	VK_CHECK(vkQueuePresentKHR(m_graphicsQueue, &presentInfo), "Queue Presentation");
+	VK_CHECK(vkQueuePresentKHR(m_graphicsQueue, &presentInfo), "Queue Presentation", false);
 
 	m_frameNumber++;
 

@@ -4,7 +4,7 @@
 #include <vulkan/vulkan.h>
 #include "RendererAPI.h"
 
-#define VK_CHECK(x, y)													\
+#define VK_CHECK(x, y, z)													\
 	do																	\
 	{																	\
 		VkResult err = x;												\
@@ -14,7 +14,8 @@
 			abort();													\
 		}																\
 		else {															\
-			std::cout << "\tSUCCESS: " << y << std::endl;}				\
+			if(z)														\
+				std::cout << "\tSUCCESS: " << y << std::endl;}			\
 	} while (0)
 
 

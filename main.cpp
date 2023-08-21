@@ -3,8 +3,9 @@
 /////////////////// GLOBAL TODO ///////////////////
 #if 0
 
-1)[] Update the VK_CHECK so that the checks called in the Draw() method do not spam print messages
-2)[] Finish the tut(chapter 2 is next);
+1) [x] Update the VK_CHECK so that the checks called in the Draw() method do not spam print messages
+2) [ ] Look at making tha Draw() method a little tighter
+3) [ ] Finish the tut(chapter 2 is next);
 
 #endif
 
