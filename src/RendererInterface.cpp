@@ -1,5 +1,5 @@
-#include "RendererInterface.h"
-#include "RendererAPI.h"
+#include "RendererInterface.hpp"
+#include "RendererAPI.hpp"
 
 RendererInterface::~RendererInterface() {
 	for (auto& meshes : m_meshMap) {

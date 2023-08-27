@@ -1,5 +1,5 @@
-#include "RendererAPI.h"
-#include "Texture.h"
+#include "RendererAPI.hpp"
+#include "Texture.hpp"
 #include <fstream>
 #include <cstring>
 
@@ -326,6 +326,7 @@ void Renderer_Vulk::Init()
 	Init_Default_RenderPass();
 	Init_Framebuffers();
 	Init_Sync();
+	Init_Shaders();
 
 	//everything went fine
 	m_isInitialized = true;
@@ -459,6 +460,11 @@ void Renderer_Vulk::Init_Sync()
 	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_render, nullptr, &m_renderSemaphore), "Create Render Semaphore", true);
 
 
+}
+
+void Renderer_Vulk::Init_Shaders()
+{
+	std::shared_ptr<VkShader> shader = std::make_shared<VkShader>(Renderer::VULKAN_VERT_SHADER_0, Renderer::VULKAN_FRAG_SHADER_0, this);
 }
 
 void Renderer_Vulk::Draw() const
@@ -616,6 +622,11 @@ void Renderer_Vulk::SetupVertexData() const
 
 void Renderer_Vulk::SetupVertexLayouts() const 
 {
+}
+
+VkDevice Renderer_Vulk::GetDevice() const
+{
+	return m_device;
 }
 
 // =================================== RENDERER_DX3D ===================================

@@ -1,8 +1,8 @@
-#ifndef RENDERER_API_H
-#define RENDERER_API_H
+#ifndef RENDERER_API_HPP
+#define RENDERER_API_HPP
 
 #define USING_VULKAN
-#include "RendererInterface.h"
+#include "RendererInterface.hpp"
 
 #if defined(USING_GL)
 #define GLEW_STATIC
@@ -14,17 +14,19 @@
 #endif
 
 #include "enumerations.h"
-#include "Shaders.h"
-#include "Texture.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "VertexLayout.h"
-#include "Mesh.h"
-
+#include "Shaders.hpp"
+#include "Texture.hpp"
+#include "VertexArray.hpp"
+#include "VertexBuffer.hpp"
+#include "IndexBuffer.hpp"
+#include "VertexLayout.hpp"
+#include "Mesh.hpp"
+#include "VkShader.hpp"
 
 namespace Renderer
 {
+	// the constexpr prevents a multiple definition error since these are defined in the header file.
+
 	constexpr const char* WINDOW_TITLE = "Sovereign Engine";
 	constexpr int WindowWidth = 800;
 	constexpr int WindowHeight = 600;
@@ -39,6 +41,9 @@ namespace Renderer
 	constexpr const char* TEXTURE_PATH2 = "../assets/textures/awesomeface.png";
 	constexpr const char* VERTEX_DATA_PATH = "../assets/vertex_data/";
 	constexpr const char* INDEX_DATA_PATH = "../assets/index_data/";
+
+	constexpr const char* VULKAN_VERT_SHADER_0 = "../shaders/binaries/vert.spv";
+	constexpr const char* VULKAN_FRAG_SHADER_0 = "../shaders/binaries/frag.spv";
 }
 
 
@@ -81,7 +86,7 @@ private:
 
 };
 
-
+class VkShader;
 class Renderer_Vulk : public RendererInterface {
 public:
 	Renderer_Vulk();
@@ -104,13 +109,17 @@ public:
 	void Init_Default_RenderPass();
 	void Init_Framebuffers();
 	void Init_Sync();
-	void Draw() const ;
+	void Init_Shaders();
+	void Draw() const;
+
+	VkDevice GetDevice() const;
 
 private:
 	mutable struct SDL_Window* m_window;
 	mutable bool m_isInitialized;
 	mutable int m_frameNumber;
 	VkExtent2D m_windowExtent{ 1700, 900 };
+	std::vector<std::shared_ptr<VkShader>> m_shaders;
 
 	// Core Init
 	VkInstance m_instance;

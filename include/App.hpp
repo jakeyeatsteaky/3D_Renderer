@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "enumerations.h"
-#include "RendererInterface.h"
+#include "RendererInterface.hpp"
 
 class App
 {

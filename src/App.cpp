@@ -1,4 +1,4 @@
-#include "App.h"
+#include "App.hpp"
 #include <iostream>
 #include "SDL2/SDL.h"
 

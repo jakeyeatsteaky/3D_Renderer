@@ -1,5 +1,5 @@
-#ifndef RENDERER_INTERFACE_H
-#define RENDERER_INTERFACE_H
+#ifndef RENDERER_INTERFACE_HPP
+#define RENDERER_INTERFACE_HPP
 #include <cstddef>
 #include "enumerations.h"
 #include <iostream>

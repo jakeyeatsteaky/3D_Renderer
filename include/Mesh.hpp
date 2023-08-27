@@ -1,12 +1,12 @@
 #ifndef MESH_H
 #define MESH_H
 #include "GL/glew.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "VertexLayout.h"
-#include "IndexBuffer.h"
-#include "Shaders.h"
-#include "Texture.h"
+#include "VertexArray.hpp"
+#include "VertexBuffer.hpp"
+#include "VertexLayout.hpp"
+#include "IndexBuffer.hpp"
+#include "Shaders.hpp"
+#include "Texture.hpp"
 #include <memory>
 
 class Mesh
