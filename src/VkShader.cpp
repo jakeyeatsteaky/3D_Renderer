@@ -4,9 +4,17 @@
 
 VkShader::VkShader(const char* vertPath, const char* fragPath, Renderer_Vulk* renderer)
 {
-	VkShaderModule outShaderModule;
-	LoadShaderModule(vertPath, renderer->GetDevice(), &outShaderModule);
-	LoadShaderModule(fragPath, renderer->GetDevice(), &outShaderModule);
+	VkShaderModule outShaderModuleVert;
+	VkShaderModule outShaderModuleFrag;
+	if (!LoadShaderModule(vertPath, renderer->GetDevice(), &outShaderModuleVert))
+		std::cout << "ERROR when Building VKShader Vertex" << std::endl;
+	else
+		std::cout << "\tSUCCESS: Built VKShader Vertex" << std::endl;
+
+	if (!LoadShaderModule(fragPath, renderer->GetDevice(), &outShaderModuleFrag))
+		std::cout << "ERROR when Building VkShader Fragment" << std::endl;
+	else
+		std::cout << "\tSUCCESS: Built VKShader Fragment" << std::endl;
 }
 
 VkShader::~VkShader()
@@ -17,6 +25,10 @@ VkShader::~VkShader()
 
 bool VkShader::LoadShaderModule(const char* filePath, const VkDevice& device, VkShaderModule* outShaderModule)
 {
+	// std::ios::ate --> open the file with the cursor "at the end"
+	//		The cursor being at the end of the file lets us know how big the file is
+	// std::ios::binary --> open in binary mode
+
 	std::ifstream file(filePath, std::ios::ate | std::ios::binary);
 
 	if (!file.is_open())
@@ -28,7 +40,7 @@ bool VkShader::LoadShaderModule(const char* filePath, const VkDevice& device, Vk
 	// find the size of the file from the stream
 	size_t fileSize = static_cast<size_t>(file.tellg());
 
-	// spirv expects uint32
+	// spirv expects uint32, create a vector big enough to hold the whole file
 	std::vector<uint32_t> buffer(fileSize / sizeof(uint32_t));
 
 	// put the file cursor at the beginning
@@ -49,7 +61,9 @@ bool VkShader::LoadShaderModule(const char* filePath, const VkDevice& device, Vk
 	createInfo.pCode = buffer.data();
 
 	VkShaderModule shaderModule;
-	VK_CHECK(vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule), "Create Shader Module", true);
+	VK_CHECK(vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule), 
+			 "Create Shader Module", 
+			  DO_NOT_LOG_STATUS);
 	*outShaderModule = shaderModule;
 
 	return true;

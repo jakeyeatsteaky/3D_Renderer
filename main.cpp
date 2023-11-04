@@ -5,7 +5,16 @@
 
 1) [x] Update the VK_CHECK so that the checks called in the Draw() method do not spam print messages
 2) [ ] Look at making tha Draw() method a little tighter
-3) [ ] Finish the tut(chapter 2 is next);
+		[ ] Make some documentation on how that process works first and then clean it up
+3) [ ] Finish the tut
+		[x] The render pipeline
+		[x] Setting up Trangle shaders
+		[ ] Setting up render pipeline
+		[ ] Passing data between shader stages
+		[ ] Toggling shaders
+		[ ] cleanup and deletion queue
+
+
 
 #endif
 

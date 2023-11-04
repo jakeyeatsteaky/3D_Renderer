@@ -3,6 +3,9 @@
 #include "RendererAPI.hpp"
 #include <vulkan/vulkan.h>
 
+#define LOG_STATUS 1
+#define DO_NOT_LOG_STATUS 0
+
 #define VK_CHECK(x, y, z)													\
 	do																		\
 	{																		\
