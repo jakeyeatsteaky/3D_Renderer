@@ -42,8 +42,8 @@ if(WIN32)
     # Specify the paths to the output SPV files
     set(VERT_SPV_FILE "${PROJECT_SOURCE_DIR}/shaders/binaries/vert.spv")
     set(FRAG_SPV_FILE "${PROJECT_SOURCE_DIR}/shaders/binaries/frag.spv")
-    
-    # Compile vertex shader
+     
+    #  Compile vertex shader
     execute_process(
         COMMAND C:/VulkanSDK/1.3.243.0/Bin/glslc.exe ${VERT_SHADER_FILE} -o ${VERT_SPV_FILE}
         RESULT_VARIABLE VERT_COMPILE_RESULT

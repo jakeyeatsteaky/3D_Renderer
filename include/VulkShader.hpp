@@ -11,18 +11,24 @@
 
 
 class Renderer_Vulk;
-class VkShader
+class VulkShader
 {
 public:
-	VkShader(const char* vertPath, const char* fragPath, Renderer_Vulk*  renderer);
-	~VkShader();
+	VulkShader(const char* vertPath, const char* fragPath, Renderer_Vulk*  renderer);
+
+	~VulkShader();
+
+	VkShaderModule m_vertShader;
+	VkShaderModule m_fragShader; 
 	
 
 private:
+
 	bool LoadShaderModule(const char* filePath, const VkDevice& device, VkShaderModule* outShaderModule);
+
 
 };
 
 
-#endif // end VkShader
+#endif // end VulkShader
 

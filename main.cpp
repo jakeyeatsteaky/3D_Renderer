@@ -9,13 +9,10 @@
 3) [ ] Finish the tut
 		[x] The render pipeline
 		[x] Setting up Trangle shaders
-		[ ] Setting up render pipeline
+		[x] Setting up render pipeline
 		[ ] Passing data between shader stages
 		[ ] Toggling shaders
 		[ ] cleanup and deletion queue
-
-
-
 #endif
 
 
@@ -60,7 +57,5 @@ How this renderer works so I can quickly get up to speed for OpenGL
 		- meshes have MVP matricies
 		- on construction, the VAO is bound so the vertex info can be bound to that vertex array 
 		- when rendering you just need to bind the vertex array 
-
-
 #endif
 

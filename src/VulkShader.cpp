@@ -1,29 +1,27 @@
-#include "VkShader.hpp"
+#include "VulkShader.hpp"
 #include "VulkanUtil.hpp"
 #include <fstream>
 
-VkShader::VkShader(const char* vertPath, const char* fragPath, Renderer_Vulk* renderer)
+VulkShader::VulkShader(const char* vertPath, const char* fragPath, Renderer_Vulk* renderer)
 {
-	VkShaderModule outShaderModuleVert;
-	VkShaderModule outShaderModuleFrag;
-	if (!LoadShaderModule(vertPath, renderer->GetDevice(), &outShaderModuleVert))
+	if (!LoadShaderModule(vertPath, renderer->GetDevice(), &m_vertShader))
 		std::cout << "ERROR when Building VKShader Vertex" << std::endl;
 	else
 		std::cout << "\tSUCCESS: Built VKShader Vertex" << std::endl;
 
-	if (!LoadShaderModule(fragPath, renderer->GetDevice(), &outShaderModuleFrag))
+	if (!LoadShaderModule(fragPath, renderer->GetDevice(), &m_fragShader))
 		std::cout << "ERROR when Building VkShader Fragment" << std::endl;
 	else
 		std::cout << "\tSUCCESS: Built VKShader Fragment" << std::endl;
 }
 
-VkShader::~VkShader()
+VulkShader::~VulkShader()
 {
 
 }
 
 
-bool VkShader::LoadShaderModule(const char* filePath, const VkDevice& device, VkShaderModule* outShaderModule)
+bool VulkShader::LoadShaderModule(const char* filePath, const VkDevice& device, VkShaderModule* outShaderModule)
 {
 	// std::ios::ate --> open the file with the cursor "at the end"
 	//		The cursor being at the end of the file lets us know how big the file is

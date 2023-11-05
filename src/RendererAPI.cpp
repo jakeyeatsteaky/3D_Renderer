@@ -8,6 +8,7 @@
 #include <SDL_vulkan.h>
 #include "VkBootstrap.h"
 #include "VulkanUtil.hpp"
+#include "PipelineBuilder.hpp"
 
 #endif
 
@@ -327,6 +328,7 @@ void Renderer_Vulk::Init()
 	Init_Framebuffers();
 	Init_Sync();
 	Init_Shaders();
+	Init_Pipelines();
 
 	//everything went fine
 	m_isInitialized = true;
@@ -464,10 +466,66 @@ void Renderer_Vulk::Init_Sync()
 
 void Renderer_Vulk::Init_Shaders()
 {
-	std::shared_ptr<VkShader> shader = std::make_shared<VkShader>(
+	m_vulkShaderPair = std::make_shared<VulkShader>(
 		Renderer::VULKAN_VERT_SHADER_0, 
 		Renderer::VULKAN_FRAG_SHADER_0, 
 		this);
+}
+
+void Renderer_Vulk::Init_Pipelines()
+{
+	// Build the pipeline Layout that controls inputs and outputs of the shader;
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo = vk_util::pipeline_layout_create_info();
+	VK_CHECK(vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &m_trianglePipelineLayout), 
+		     "Create Pipeline Layout", 
+		     LOG_STATUS);
+
+	// With Pipline Layout specified, build the pipeline;
+	PipelineBuilder pipelineBuilder;
+	pipelineBuilder.m_shaderStages.push_back(
+		vk_util::pipeline_shader_stage_create_info(
+			VK_SHADER_STAGE_VERTEX_BIT, 
+		    m_vulkShaderPair->m_vertShader));
+
+	pipelineBuilder.m_shaderStages.push_back(
+		vk_util::pipeline_shader_stage_create_info(
+			VK_SHADER_STAGE_FRAGMENT_BIT,
+			m_vulkShaderPair->m_fragShader));
+
+	// Vertex input controls how to read vertices from vertex buffers
+	// NOT BEING USED YET
+	pipelineBuilder.m_vertexInputInfo = vk_util::vertex_input_state_create_info();
+
+	//input assembly is the configuration for drawing triangle lists, strips, or individual points.
+	//we are just going to draw triangle list
+	pipelineBuilder.m_inputAssembly = vk_util::input_assembly_create_info(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+
+	//build viewport and scissor from the swapchain extents
+	pipelineBuilder.m_viewport.x = 0.0f;
+	pipelineBuilder.m_viewport.y = 0.0f;
+	pipelineBuilder.m_viewport.width = (float)m_windowExtent.width;
+	pipelineBuilder.m_viewport.height = (float)m_windowExtent.height;
+	pipelineBuilder.m_viewport.minDepth = 0.0f;
+	pipelineBuilder.m_viewport.maxDepth = 1.0f;
+
+	pipelineBuilder.m_scissor.offset = { 0, 0 };
+	pipelineBuilder.m_scissor.extent = m_windowExtent;
+
+	//configure the rasterizer to draw filled triangles
+	pipelineBuilder.m_rasterizer = vk_util::rasterization_state_create_info(VK_POLYGON_MODE_FILL);
+
+	//we don't use multisampling, so just run the default one
+	pipelineBuilder.m_multisampling = vk_util::multisampling_state_create_info();
+
+	//a single blend attachment with no blending and writing to RGBA
+	pipelineBuilder.m_colorBlendAttachment = vk_util::color_blend_attachment_state();
+
+	//use the triangle layout we created
+	pipelineBuilder.m_pipelineLayout = m_trianglePipelineLayout;
+
+	//finally build the pipeline
+	m_trianglePipeline = pipelineBuilder.BuildPipeline(m_device, m_renderPass);
+
 }
 
 void Renderer_Vulk::Draw() const
@@ -500,6 +558,8 @@ void Renderer_Vulk::Draw() const
 	vkCmdBeginRenderPass(m_commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// RENDERING COMMANDS GO HERE
+	vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglePipeline);
+	vkCmdDraw(cmd, 3, 1, 0, 0);
 
 	vkCmdEndRenderPass(m_commandBuffer);
 

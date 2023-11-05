@@ -10,9 +10,10 @@
 #include <SDL2/SDL_opengl.h>
 #elif defined(USING_VULKAN)
 #include <vulkan/vulkan.h>
+
 #else
 #endif
-
+#include <memory>
 #include "enumerations.h"
 #include "Shaders.hpp"
 #include "Texture.hpp"
@@ -21,7 +22,8 @@
 #include "IndexBuffer.hpp"
 #include "VertexLayout.hpp"
 #include "Mesh.hpp"
-#include "VkShader.hpp"
+#include "VulkShader.hpp"
+
 
 namespace Renderer
 {
@@ -86,7 +88,7 @@ private:
 
 };
 
-class VkShader;
+class VulkShader;
 class Renderer_Vulk : public RendererInterface {
 public:
 	Renderer_Vulk();
@@ -110,6 +112,7 @@ public:
 	void Init_Framebuffers();
 	void Init_Sync();
 	void Init_Shaders();
+	void Init_Pipelines();
 	void Draw() const;
 
 	VkDevice GetDevice() const;
@@ -118,8 +121,7 @@ private:
 	mutable struct SDL_Window* m_window;
 	mutable bool m_isInitialized;
 	mutable int m_frameNumber;
-	VkExtent2D m_windowExtent{ 1700, 900 };
-	std::vector<std::shared_ptr<VkShader>> m_shaders;
+	VkExtent2D m_windowExtent{ 800, 600 };
 
 	// Core Init
 	VkInstance m_instance;
@@ -148,6 +150,11 @@ private:
 	VkSemaphore m_presentSemaphore;
 	VkSemaphore m_renderSemaphore;
 	VkFence m_renderFence;
+
+	// Graphics Pipeline
+	std::shared_ptr<VulkShader> m_vulkShaderPair;
+	VkPipelineLayout m_trianglePipelineLayout;
+	VkPipeline m_trianglePipeline;
 
 };
 
