@@ -12,7 +12,11 @@
 		[x] Setting up render pipeline
 		[x] Passing data between shader stages
 		[ ] Toggling shaders
+			[ ] Did My Own Implementation
+			[ ] Read the docs on vkguide just to see what he did (Section: Multiple Pipelines)
 		[ ] cleanup and deletion queue
+4) [ ] Implement the command pattern for updating game objects??
+
 
 NOTE FOR WHEN YOU COME BACK
 	Right now I am curious about how to handle the toggling of a shader.  SHould the updateShaderIdx function be called from App.Input?  Or should I append a command?

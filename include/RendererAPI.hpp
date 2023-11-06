@@ -46,6 +46,9 @@ namespace Renderer
 
 	constexpr const char* VULKAN_VERT_SHADER_0 = "../shaders/binaries/vert.spv";
 	constexpr const char* VULKAN_FRAG_SHADER_0 = "../shaders/binaries/frag.spv";
+
+	constexpr const char* VULKAN_VERT_SHADER_1 = "../shaders/binaries/vert2.spv";
+	constexpr const char* VULKAN_FRAG_SHADER_1 = "../shaders/binaries/frag2.spv";
 }
 
 
@@ -57,7 +60,7 @@ public:
 	
 	// RenderInterface virtual functions
 	virtual void Init()  override {}
-	virtual void Input() const override{}
+	virtual void Input(SDL_KeyCode) const override{}
 	virtual void Render() const override{}
 	virtual void Update() override{}
 	virtual void OpenWindow() const override{}
@@ -94,7 +97,7 @@ public:
 	Renderer_Vulk();
 	virtual ~Renderer_Vulk();
 	virtual void Init()  override; // intializes SDL windowing
-	virtual void Input() const override;
+	virtual void Input(SDL_KeyCode sdlKey) const override;
 	virtual void Render() const override;
 	virtual void Update() override;
 	virtual void OpenWindow() const override;
@@ -115,11 +118,14 @@ public:
 	void Init_Pipelines();
 	void Draw() const;
 
+	void ToggleShaderPipeline();
+
 	VkDevice GetDevice() const;
 
 private:
 	mutable struct SDL_Window* m_window;
 	mutable bool m_isInitialized;
+	mutable bool m_updateShader; 
 	mutable int m_frameNumber;
 	VkExtent2D m_windowExtent{ 800, 600 };
 
@@ -152,11 +158,11 @@ private:
 	VkFence m_renderFence;
 
 	// Graphics Pipeline
-	std::vector<std::shared_ptr<VulkShader>> m_shaders;
+	std::vector<std::shared_ptr<VulkShader>> m_shaders;					
 	std::shared_ptr<VulkShader> m_vulkShaderPair;
-	int m_selectedShaderIdx;
-	VkPipelineLayout m_trianglePipelineLayout;
-	VkPipeline m_trianglePipeline;
+	int m_activePipeline;
+	std::vector<std::pair<VkPipelineLayout, VkPipeline>> m_pipelines;
+	
 
 };
 
@@ -165,7 +171,7 @@ public:
 	Renderer_DX();
 	virtual ~Renderer_DX();
 	virtual void Init() override;
-	virtual void Input() const override;
+	virtual void Input(SDL_KeyCode) const override;
 	virtual void Render() const override;
 	virtual void Update() override;
 	virtual void OpenWindow() const override;

@@ -76,7 +76,7 @@ void Renderer_GL::Init() const
 	m_meshes.push_back(mesh3);
 }
 
-void Renderer_GL::Input() const
+void Renderer_GL::Input(SDL_KeyCode) const
 {
 }
 
@@ -294,10 +294,10 @@ bool Renderer_GL::InitSuccess() const
 Renderer_Vulk::Renderer_Vulk() :
 	m_window(nullptr),
 	m_isInitialized(false),
-	m_selectedShaderIdx(0)
+	m_updateShader(false),
+	m_activePipeline(0)
 {
 	Init();
-	
 }
 
 Renderer_Vulk::~Renderer_Vulk()
@@ -473,66 +473,95 @@ void Renderer_Vulk::Init_Shaders()
 		this);
 
 	m_shaders.push_back(m_vulkShaderPair);
+
+	m_vulkShaderPair = std::make_shared<VulkShader>(
+		Renderer::VULKAN_VERT_SHADER_1,
+		Renderer::VULKAN_FRAG_SHADER_1,
+		this);
+
+	m_shaders.push_back(m_vulkShaderPair);
+
 }
 
 void Renderer_Vulk::Init_Pipelines()
 {
-	// Build the pipeline Layout that controls inputs and outputs of the shader;
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo = vk_util::pipeline_layout_create_info();
-	VK_CHECK(vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &m_trianglePipelineLayout), 
-		     "Create Pipeline Layout", 
-		     LOG_STATUS);
+	////////////////////////////////////////////////////////////////////////
+	////////////////// How Pipelines Work Right Now ////////////////////////
+	////////////////////////////////////////////////////////////////////////
+	// I am doing this so I can use the space bar to toggle the shader on an object.
+	// 
+	// A shader module requires a pipeline (which requires a pipeline layout)
+	// 
+	// Here, the pipeline layout is configured and the pipeline is built
+	// Both are added to the m_pipelines vector.
+	// 
+	// m_pipelines is used in the DRAW function under vkCmdBindPipeline
+	////////////////////////////////////////////////////////////////////////
 
-	// With Pipline Layout specified, build the pipeline;
-	PipelineBuilder pipelineBuilder;
-	pipelineBuilder.m_shaderStages.push_back(
-		vk_util::pipeline_shader_stage_create_info(
-			VK_SHADER_STAGE_VERTEX_BIT, 
-		    m_vulkShaderPair->m_vertShader));
+	int numShaders = (int)m_shaders.size();
+	for(int i = 0; i < numShaders; i++)
+	{
+		// Build the pipeline Layout that controls inputs and outputs of the shader;
+		VkPipelineLayoutCreateInfo pipelineLayoutInfo = vk_util::pipeline_layout_create_info();
+		VkPipelineLayout pipelineLayout;
+		VK_CHECK(vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &pipelineLayout),
+			"Create Pipeline Layout",
+			LOG_STATUS);
 
-	pipelineBuilder.m_shaderStages.push_back(
-		vk_util::pipeline_shader_stage_create_info(
-			VK_SHADER_STAGE_FRAGMENT_BIT,
-			m_vulkShaderPair->m_fragShader));
+		// With Pipline Layout specified, build the pipeline;
+		PipelineBuilder pipelineBuilder;
+		pipelineBuilder.m_shaderStages.push_back(
+			vk_util::pipeline_shader_stage_create_info(
+				VK_SHADER_STAGE_VERTEX_BIT,
+				m_shaders[i]->m_vertShader));
 
-	// Vertex input controls how to read vertices from vertex buffers
-	// NOT BEING USED YET
-	pipelineBuilder.m_vertexInputInfo = vk_util::vertex_input_state_create_info();
+		pipelineBuilder.m_shaderStages.push_back(
+			vk_util::pipeline_shader_stage_create_info(
+				VK_SHADER_STAGE_FRAGMENT_BIT,
+				m_shaders[i]->m_fragShader));
 
-	//input assembly is the configuration for drawing triangle lists, strips, or individual points.
-	//we are just going to draw triangle list
-	pipelineBuilder.m_inputAssembly = vk_util::input_assembly_create_info(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+		// Vertex input controls how to read vertices from vertex buffers
+		// NOT BEING USED YET
+		pipelineBuilder.m_vertexInputInfo = vk_util::vertex_input_state_create_info();
 
-	//build viewport and scissor from the swapchain extents
-	pipelineBuilder.m_viewport.x = 0.0f;
-	pipelineBuilder.m_viewport.y = 0.0f;
-	pipelineBuilder.m_viewport.width = (float)m_windowExtent.width;
-	pipelineBuilder.m_viewport.height = (float)m_windowExtent.height;
-	pipelineBuilder.m_viewport.minDepth = 0.0f;
-	pipelineBuilder.m_viewport.maxDepth = 1.0f;
+		//input assembly is the configuration for drawing triangle lists, strips, or individual points.
+		//we are just going to draw triangle list
+		pipelineBuilder.m_inputAssembly = vk_util::input_assembly_create_info   (VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 
-	pipelineBuilder.m_scissor.offset = { 0, 0 };
-	pipelineBuilder.m_scissor.extent = m_windowExtent;
+		//build viewport and scissor from the swapchain extents
+		pipelineBuilder.m_viewport.x = 0.0f;
+		pipelineBuilder.m_viewport.y = 0.0f;
+		pipelineBuilder.m_viewport.width = (float)m_windowExtent.width;
+		pipelineBuilder.m_viewport.height = (float)m_windowExtent.height;
+		pipelineBuilder.m_viewport.minDepth = 0.0f;
+		pipelineBuilder.m_viewport.maxDepth = 1.0f;
 
-	//configure the rasterizer to draw filled triangles
-	pipelineBuilder.m_rasterizer = vk_util::rasterization_state_create_info(VK_POLYGON_MODE_FILL);
+		pipelineBuilder.m_scissor.offset = { 0, 0 };
+		pipelineBuilder.m_scissor.extent = m_windowExtent;
 
-	//we don't use multisampling, so just run the default one
-	pipelineBuilder.m_multisampling = vk_util::multisampling_state_create_info();
+		//configure the rasterizer to draw filled triangles
+		pipelineBuilder.m_rasterizer = vk_util::rasterization_state_create_info(VK_POLYGON_MODE_FILL);
 
-	//a single blend attachment with no blending and writing to RGBA
-	pipelineBuilder.m_colorBlendAttachment = vk_util::color_blend_attachment_state();
+		//we don't use multisampling, so just run the default one
+		pipelineBuilder.m_multisampling = vk_util::multisampling_state_create_info();
 
-	//use the triangle layout we created
-	pipelineBuilder.m_pipelineLayout = m_trianglePipelineLayout;
+		//a single blend attachment with no blending and writing to RGBA
+		pipelineBuilder.m_colorBlendAttachment = vk_util::color_blend_attachment_state();
 
-	//finally build the pipeline
-	m_trianglePipeline = pipelineBuilder.BuildPipeline(m_device, m_renderPass);
+		//use the triangle layout we created
+		pipelineBuilder.m_pipelineLayout = pipelineLayout;
 
+		//finally build the pipeline
+		VkPipeline pipeline;
+		pipeline = pipelineBuilder.BuildPipeline(m_device, m_renderPass);
+
+		m_pipelines.push_back(std::pair<VkPipelineLayout, VkPipeline>(pipelineLayout, pipeline));
+	}
 }
 
 void Renderer_Vulk::Draw() const
 {
+	VkCommandBuffer cmd = m_commandBuffer;
 	// wait until GPU has finished work
 	VK_CHECK(vkWaitForFences(m_device, 1, &m_renderFence, true, 1000000000), "Wait for Fences", DO_NOT_LOG_STATUS);
 	VK_CHECK(vkResetFences(m_device, 1, &m_renderFence), "Reset Fences", DO_NOT_LOG_STATUS);
@@ -542,9 +571,8 @@ void Renderer_Vulk::Draw() const
 	VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr, &swapchainImageidx), "Acquire SC Idx", DO_NOT_LOG_STATUS);
 	
 	// Reset the command buffer and begin commands
-	VK_CHECK(vkResetCommandBuffer(m_commandBuffer, 0), "Reset Command Buffer", DO_NOT_LOG_STATUS);
+	VK_CHECK(vkResetCommandBuffer(cmd, 0), "Reset Command Buffer", DO_NOT_LOG_STATUS);
 
-	VkCommandBuffer cmd = m_commandBuffer;
 	VkCommandBufferBeginInfo cmdBufBeginInfo = vk_util::cmd_buf_begin_info(nullptr, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
 	VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBufBeginInfo), "Begin Command Buffer", DO_NOT_LOG_STATUS);
@@ -558,15 +586,15 @@ void Renderer_Vulk::Draw() const
 	VkExtent2D extent = { Renderer::WindowWidth, Renderer::WindowHeight };
 	VkRenderPassBeginInfo renderPassBeginInfo = vk_util::cmd_renderpass_begin_info(m_renderPass, extent, m_frameBuffers[swapchainImageidx], &val);
 
-	vkCmdBeginRenderPass(m_commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBeginRenderPass(cmd, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// RENDERING COMMANDS GO HERE
-	vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_trianglePipeline);
+	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelines[m_activePipeline].second);
 	vkCmdDraw(cmd, 3, 1, 0, 0);
 
-	vkCmdEndRenderPass(m_commandBuffer);
+	vkCmdEndRenderPass(cmd);
 
-	VK_CHECK(vkEndCommandBuffer(m_commandBuffer), "End Command Buffer", DO_NOT_LOG_STATUS);
+	VK_CHECK(vkEndCommandBuffer(cmd), "End Command Buffer", DO_NOT_LOG_STATUS);
 
 	// Execute commands by submitting them to the GPU
 	// we are waiting on the PresentSemaphore (so we know the swapchain is ready)
@@ -579,7 +607,7 @@ void Renderer_Vulk::Draw() const
 		1,
 		&const_cast<VkSemaphore>(m_renderSemaphore),
 		1,
-		&const_cast<VkCommandBuffer>(m_commandBuffer));
+		&const_cast<VkCommandBuffer>(cmd));
 
 	VK_CHECK(vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_renderFence), "Queue Submission", DO_NOT_LOG_STATUS);
 
@@ -655,10 +683,26 @@ void Renderer_Vulk::Render() const
 
 void Renderer_Vulk::Update()
 {
+	
+	if (m_updateShader) {
+		m_updateShader = false;
+		ToggleShaderPipeline();
+		
+	}
 }
 
-void Renderer_Vulk::Input() const
+void Renderer_Vulk::Input(SDL_KeyCode sdlKey) const
 {
+	switch (sdlKey)
+	{
+		case SDLK_SPACE:
+		{
+			m_updateShader = true;
+			break;
+		}
+		default:
+			break;
+	}
 }
 
 void Renderer_Vulk::OpenWindow() const
@@ -693,6 +737,20 @@ void Renderer_Vulk::SetupVertexLayouts() const
 VkDevice Renderer_Vulk::GetDevice() const
 {
 	return m_device;
+}
+
+void Renderer_Vulk::ToggleShaderPipeline()
+{
+	size_t numPipelines = m_pipelines.size(); 
+
+	std::cout << "Current Pipeline Idx: " << m_activePipeline << std::endl;
+
+	if (m_activePipeline < numPipelines - 1)
+		m_activePipeline += 1;
+	else
+		m_activePipeline = 0;
+
+	std::cout << "Changed to Pipeline Idx: " << m_activePipeline << std::endl;
 }
 
 // =================================== RENDERER_DX3D ===================================
@@ -741,7 +799,7 @@ void Renderer_DX::SetupVertexLayouts() const
 {
 }
 
-void Renderer_DX::Input() const
+void Renderer_DX::Input(SDL_KeyCode) const
 {
 }
 

@@ -8,6 +8,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include <SDL.h>
+
 class Mesh;
 
 class RendererInterface {
@@ -18,7 +20,7 @@ public:
 	static std::unique_ptr<RendererInterface> MakeRenderer(RENDERER_API api);
 
 	virtual void Init() = 0;
-	virtual void Input() const = 0;
+	virtual void Input(SDL_KeyCode sdlKey) const = 0;
 	virtual void Render() const = 0;
 	virtual void Update() = 0;
 	virtual void OpenWindow() const = 0;

@@ -51,7 +51,7 @@ void App::Input()
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                     m_isRunning = false;
                 if (event.key.keysym.sym == SDLK_SPACE)
-                    std::cout << "SPACE" << std::endl; // Implemnent command pattern
+                    m_renderer->Input(SDLK_SPACE); 
                 break;
             case SDL_MOUSEWHEEL:
                 if (event.wheel.y > 0) 
