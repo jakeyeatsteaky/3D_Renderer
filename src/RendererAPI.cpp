@@ -293,7 +293,8 @@ bool Renderer_GL::InitSuccess() const
 
 Renderer_Vulk::Renderer_Vulk() :
 	m_window(nullptr),
-	m_isInitialized(false)
+	m_isInitialized(false),
+	m_selectedShaderIdx(0)
 {
 	Init();
 	
@@ -470,6 +471,8 @@ void Renderer_Vulk::Init_Shaders()
 		Renderer::VULKAN_VERT_SHADER_0, 
 		Renderer::VULKAN_FRAG_SHADER_0, 
 		this);
+
+	m_shaders.push_back(m_vulkShaderPair);
 }
 
 void Renderer_Vulk::Init_Pipelines()

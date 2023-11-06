@@ -10,9 +10,16 @@
 		[x] The render pipeline
 		[x] Setting up Trangle shaders
 		[x] Setting up render pipeline
-		[ ] Passing data between shader stages
+		[x] Passing data between shader stages
 		[ ] Toggling shaders
 		[ ] cleanup and deletion queue
+
+NOTE FOR WHEN YOU COME BACK
+	Right now I am curious about how to handle the toggling of a shader.  SHould the updateShaderIdx function be called from App.Input?  Or should I append a command?
+
+	I would like to implement the command pattern here, and maybe even make it multithreaded.  Somewthing to think about.
+
+
 #endif
 
 

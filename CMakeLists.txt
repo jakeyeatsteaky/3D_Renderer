@@ -26,6 +26,10 @@ if(WIN32)
     file(GLOB_RECURSE HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/include/*.hpp")
     target_sources(3DRenderer PRIVATE ${HEADER_LIST})
 
+    file(GLOB_RECURSE SHADER_FILES "${PROJECT_SOURCE_DIR}/shaders/*.*")
+    source_group("Shaders" FILES ${SHADER_FILES})
+    target_sources(3DRenderer PRIVATE ${SHADER_FILES})
+
     set(SDL2_DIR "C:/Program Files/SDL2")
     set(CMAKE_PREFIX_PATH "C:/Program Files/glew-2.2.0")
     set(GLEW_INCLUDE_DIR "C:/Program Files/glew-2.2.0/include")

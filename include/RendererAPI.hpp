@@ -152,7 +152,9 @@ private:
 	VkFence m_renderFence;
 
 	// Graphics Pipeline
+	std::vector<std::shared_ptr<VulkShader>> m_shaders;
 	std::shared_ptr<VulkShader> m_vulkShaderPair;
+	int m_selectedShaderIdx;
 	VkPipelineLayout m_trianglePipelineLayout;
 	VkPipeline m_trianglePipeline;
 
