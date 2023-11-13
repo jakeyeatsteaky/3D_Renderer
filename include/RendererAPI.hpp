@@ -49,6 +49,9 @@ namespace Renderer
 
 	constexpr const char* VULKAN_VERT_SHADER_1 = "../shaders/binaries/vert2.spv";
 	constexpr const char* VULKAN_FRAG_SHADER_1 = "../shaders/binaries/frag2.spv";
+
+	constexpr const char* VULKAN_VERT_SHADER_2 = "../shaders/binaries/vert3.spv";
+	constexpr const char* VULKAN_FRAG_SHADER_2 = "../shaders/binaries/frag3.spv";
 }
 
 

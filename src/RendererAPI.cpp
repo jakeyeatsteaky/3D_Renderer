@@ -481,6 +481,13 @@ void Renderer_Vulk::Init_Shaders()
 
 	m_shaders.push_back(m_vulkShaderPair);
 
+	m_vulkShaderPair = std::make_shared<VulkShader>(
+		Renderer::VULKAN_VERT_SHADER_2,
+		Renderer::VULKAN_FRAG_SHADER_2,
+		this);
+
+	m_shaders.push_back(m_vulkShaderPair);
+
 }
 
 void Renderer_Vulk::Init_Pipelines()
@@ -556,6 +563,7 @@ void Renderer_Vulk::Init_Pipelines()
 		pipeline = pipelineBuilder.BuildPipeline(m_device, m_renderPass);
 
 		m_pipelines.push_back(std::pair<VkPipelineLayout, VkPipeline>(pipelineLayout, pipeline));
+		pipelineBuilder.m_shaderStages.clear();
 	}
 }
 

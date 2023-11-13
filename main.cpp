@@ -12,7 +12,8 @@
 		[x] Setting up render pipeline
 		[x] Passing data between shader stages
 		[ ] Toggling shaders
-			[ ] Did My Own Implementation
+			[x] Did My Own Implementation
+			[x] As an exercise, add a third shader, and iterate through all three using spacebar
 			[ ] Read the docs on vkguide just to see what he did (Section: Multiple Pipelines)
 		[ ] cleanup and deletion queue
 4) [ ] Implement the command pattern for updating game objects??
