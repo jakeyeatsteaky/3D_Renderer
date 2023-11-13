@@ -321,6 +321,8 @@ void Renderer_Vulk::Init()
 		Renderer::WindowHeight, 
 		window_flags 
 	);
+
+	m_mainDeletionQueue = std::make_shared<DeletionQueue>();
 	
 	Init_Vulkan();
 	Init_Swapchain();
@@ -387,6 +389,11 @@ void Renderer_Vulk::Init_Swapchain()
 	m_swapchainImages = vkbSwapchain.get_images().value();
 	m_swapchainImageViews = vkbSwapchain.get_image_views().value();
 	m_swapchainFormat = vkbSwapchain.image_format;
+
+	// Add to DeletionQueue
+	m_mainDeletionQueue->PushFunction([=]() {
+		vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+		});
 }
 
 void Renderer_Vulk::Init_Commands()
@@ -400,6 +407,10 @@ void Renderer_Vulk::Init_Commands()
 	VkCommandBufferAllocateInfo cmdBufAllocInfo = vk_util::cmd_buf_alloc_info(m_commandPool);
 
 	VK_CHECK(vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, &m_commandBuffer), "Allocate Command Buffer", true);
+
+	m_mainDeletionQueue->PushFunction([=]() {
+			vkDestroyCommandPool(m_device, m_commandPool, nullptr);
+		});
 
 }
 
@@ -428,6 +439,10 @@ void Renderer_Vulk::Init_Default_RenderPass()
 	VkRenderPassCreateInfo renderPassInfo = vk_util::cmd_renderpass_create_info(&colorAttachment, &subpass);
 
 	VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_renderPass), "Create Render Pass", true);
+
+	m_mainDeletionQueue->PushFunction([=]() {
+		vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+		});
 }
 
 void Renderer_Vulk::Init_Framebuffers()
@@ -449,6 +464,11 @@ void Renderer_Vulk::Init_Framebuffers()
 	{
 		fb_info.pAttachments = &m_swapchainImageViews[i];
 		VK_CHECK(vkCreateFramebuffer(m_device, &fb_info, nullptr, &m_frameBuffers[i]), text[i], true);
+
+		m_mainDeletionQueue->PushFunction([=]() {
+			vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
+			vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
+			});
 	}
 }
 
@@ -461,6 +481,15 @@ void Renderer_Vulk::Init_Sync()
 	VK_CHECK(vkCreateFence(m_device, &fenceCreateInfo, nullptr, &m_renderFence), "Create Fence", true);
 	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_present, nullptr, &m_presentSemaphore), "Create Present Semaphore", true);
 	VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo_render, nullptr, &m_renderSemaphore), "Create Render Semaphore", true);
+
+	m_mainDeletionQueue->PushFunction([=]() {
+			vkDestroyFence(m_device, m_renderFence, nullptr);
+		});
+
+	m_mainDeletionQueue->PushFunction([=]() {
+			vkDestroySemaphore(m_device, m_presentSemaphore, nullptr);
+			vkDestroySemaphore(m_device, m_renderSemaphore, nullptr);
+		});
 
 
 }
@@ -506,14 +535,19 @@ void Renderer_Vulk::Init_Pipelines()
 	////////////////////////////////////////////////////////////////////////
 
 	int numShaders = (int)m_shaders.size();
+	// Build the pipeline Layout that controls inputs and outputs of the shader;
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo = vk_util::pipeline_layout_create_info();
+	VkPipelineLayout pipelineLayout;
+	VK_CHECK(vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &pipelineLayout),
+		"Create Pipeline Layout",
+		LOG_STATUS);
+
+	m_mainDeletionQueue->PushFunction([=]() {
+		vkDestroyPipelineLayout(m_device, pipelineLayout, nullptr);
+	});
+
 	for(int i = 0; i < numShaders; i++)
 	{
-		// Build the pipeline Layout that controls inputs and outputs of the shader;
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo = vk_util::pipeline_layout_create_info();
-		VkPipelineLayout pipelineLayout;
-		VK_CHECK(vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &pipelineLayout),
-			"Create Pipeline Layout",
-			LOG_STATUS);
 
 		// With Pipline Layout specified, build the pipeline;
 		PipelineBuilder pipelineBuilder;
@@ -564,6 +598,17 @@ void Renderer_Vulk::Init_Pipelines()
 
 		m_pipelines.push_back(std::pair<VkPipelineLayout, VkPipeline>(pipelineLayout, pipeline));
 		pipelineBuilder.m_shaderStages.clear();
+
+		// Destroy shader modules (does not need to be enqueued
+		vkDestroyShaderModule(m_device, m_shaders[i]->m_fragShader,  nullptr);
+		vkDestroyShaderModule(m_device, m_shaders[i]->m_vertShader, nullptr);
+		m_shaders[i]->UpdateShaderModuleDestroyed();
+
+		// Destroy pipelines and pipeline layout
+		m_mainDeletionQueue->PushFunction([=]() {
+			vkDestroyPipeline(m_device, pipeline, nullptr);
+		});
+
 	}
 }
 
@@ -640,30 +685,9 @@ void Renderer_Vulk::Cleanup()
 	{
 		// Wait for commands to be in a destroyable state
 		vkDeviceWaitIdle(m_device);
+		vkWaitForFences(m_device, 1, &m_renderFence, true, 1000000000);
 
-		//Semaphore
-		vkDestroySemaphore(m_device, m_presentSemaphore, nullptr);
-		vkDestroySemaphore(m_device, m_renderSemaphore, nullptr);
-
-		// Fence
-		vkDestroyFence(m_device, m_renderFence, nullptr);
-
-		// command pool
-		vkDestroyCommandPool(m_device, m_commandPool, nullptr);
-
-		// swapchain
-		vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
-
-		// render pass 
-		vkDestroyRenderPass(m_device, m_renderPass, nullptr);
-
-		// image views and framebuffers should be done together
-		for (size_t i = 0; i < m_swapchainImageViews.size(); ++i)
-		{
-			vkDestroyImageView(m_device, m_swapchainImageViews[i], nullptr);
-			// no need to destroy images because images are owned and destroyed in the swapchain
-			vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
-		}
+		m_mainDeletionQueue->Flush();
 
 		// device
 		vkDestroyDevice(m_device, nullptr);

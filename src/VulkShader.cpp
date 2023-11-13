@@ -2,7 +2,8 @@
 #include "VulkanUtil.hpp"
 #include <fstream>
 
-VulkShader::VulkShader(const char* vertPath, const char* fragPath, Renderer_Vulk* renderer)
+VulkShader::VulkShader(const char* vertPath, const char* fragPath, Renderer_Vulk* renderer) :
+	m_shaderModulesDestroyed(false)
 {
 	if (!LoadShaderModule(vertPath, renderer->GetDevice(), &m_vertShader))
 		std::cout << "ERROR when Building VKShader Vertex" << std::endl;
@@ -65,4 +66,14 @@ bool VulkShader::LoadShaderModule(const char* filePath, const VkDevice& device, 
 	*outShaderModule = shaderModule;
 
 	return true;
+}
+
+bool VulkShader::ShaderModulesDestroyed()
+{
+	return m_shaderModulesDestroyed;
+}
+
+void VulkShader::UpdateShaderModuleDestroyed()
+{
+	m_shaderModulesDestroyed = true;
 }

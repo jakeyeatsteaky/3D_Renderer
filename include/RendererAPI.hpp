@@ -3,6 +3,7 @@
 
 #define USING_VULKAN
 #include "RendererInterface.hpp"
+#include "DeletionQueue.hpp"
 
 #if defined(USING_GL)
 #define GLEW_STATIC
@@ -165,7 +166,9 @@ private:
 	std::shared_ptr<VulkShader> m_vulkShaderPair;
 	int m_activePipeline;
 	std::vector<std::pair<VkPipelineLayout, VkPipeline>> m_pipelines;
-	
+
+	// Cleanup
+	std::shared_ptr<DeletionQueue> m_mainDeletionQueue;
 
 };
 

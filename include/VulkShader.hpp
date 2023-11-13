@@ -20,10 +20,13 @@ public:
 
 	VkShaderModule m_vertShader;
 	VkShaderModule m_fragShader; 
+
+	bool ShaderModulesDestroyed();
+	void UpdateShaderModuleDestroyed();
 	
 
 private:
-
+	bool m_shaderModulesDestroyed;
 	bool LoadShaderModule(const char* filePath, const VkDevice& device, VkShaderModule* outShaderModule);
 
 
