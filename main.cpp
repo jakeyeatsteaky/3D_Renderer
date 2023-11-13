@@ -6,17 +6,20 @@
 1) [x] Update the VK_CHECK so that the checks called in the Draw() method do not spam print messages
 2) [ ] Look at making tha Draw() method a little tighter
 		[ ] Make some documentation on how that process works first and then clean it up
-3) [ ] Finish the tut
+3) [x] Finish the tut Chapter 2
 		[x] The render pipeline
 		[x] Setting up Trangle shaders
 		[x] Setting up render pipeline
 		[x] Passing data between shader stages
-		[ ] Toggling shaders
+		[x] Toggling shaders
 			[x] Did My Own Implementation
 			[x] As an exercise, add a third shader, and iterate through all three using spacebar
-			[ ] Read the docs on vkguide just to see what he did (Section: Multiple Pipelines)
-		[ ] cleanup and deletion queue
-4) [ ] Implement the command pattern for updating game objects??
+			[x] Read the docs on vkguide just to see what he did (Section: Multiple Pipelines)
+		[x] cleanup and deletion queue
+4) [ ] Chapter 3
+		[ ] Vertex Buffers
+
+5) [ ] Implement the command pattern for updating game objects??
 
 
 NOTE FOR WHEN YOU COME BACK
