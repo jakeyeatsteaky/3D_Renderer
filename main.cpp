@@ -4,6 +4,9 @@
 #if 0
 	SDL Renderer
 
+		[ ] Start making some shapes
+
+		[ ] clean up vulkan shit that needs to build at the start
 
 #endif
 

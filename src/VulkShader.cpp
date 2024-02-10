@@ -2,7 +2,6 @@
 #include "VulkanUtil.hpp"
 #include <fstream>
 
-#ifdef USING_VULKAN
 VulkShader::VulkShader(const char* vertPath, const char* fragPath, Renderer_Vulk* renderer) :
 	m_shaderModulesDestroyed(false)
 {
@@ -78,4 +77,3 @@ void VulkShader::UpdateShaderModuleDestroyed()
 {
 	m_shaderModulesDestroyed = true;
 }
-#endif

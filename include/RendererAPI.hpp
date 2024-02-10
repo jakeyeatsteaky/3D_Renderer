@@ -11,9 +11,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
-#if defined(USING_VULKAN)
 #include <vulkan/vulkan.h>
-#endif
 
 #include <memory>
 #include "enumerations.h"
@@ -59,47 +57,28 @@ namespace Renderer
 class Renderer_SDL : public RendererInterface
 {
 public:
-	Renderer_SDL() :
-		m_window(nullptr),
-		m_renderer(nullptr)
-	{
-		SDL_Window* pWindow = SDL_CreateWindow("SDL Renderer",
-			SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED,
-			Renderer::WindowWidth,
-			Renderer::WindowHeight,
-			SDL_WINDOW_RESIZABLE);
-		m_window = std::make_unique<SDL_Window>(pWindow);
+	Renderer_SDL();
+	~Renderer_SDL();
 
-		SDL_Renderer* pRenderer = SDL_CreateRenderer(m_window.get(), -1, 0);
-		if (!pRenderer)
-		{
-			std::cout << "Failed to Created SDL Renderer: " << SDL_GetError() << std::endl;
-			throw SDL_GetError();
-		}
-		m_renderer = std::make_unique<SDL_Renderer>(pRenderer);
-
-		std::cout << "break" << std::endl;
-	}
-
-
-	virtual void Init()  override {}
-	virtual void Input(SDL_KeyCode) const override {}
-	virtual void Render() const override {}
-	virtual void Update() override {}
+	virtual void Init()  override;
+	virtual void Input(SDL_KeyCode) const override;
+	virtual void Render() const override;
+	virtual void Update() override;
 	virtual void OpenWindow() const override {}
 	virtual void ClearScreen() const override {}
 	virtual void SetupShaders() const override {}
 	virtual void SetupTextures() const override {}
-	virtual bool InitSuccess() const override { return false; }
+	virtual bool InitSuccess() const override;
 	virtual void SetupVertexData() const override {}
 	virtual void SetupVertexLayouts() const override {}
 	void GeneratePrimitives() const {}
 	virtual void Cleanup() override {}
 
 private:
-	std::unique_ptr<SDL_Window> m_window;
-	std::unique_ptr<SDL_Renderer> m_renderer;
+	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> m_window;
+	std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> m_renderer;
+
+	bool m_initSuccess;
 };
 
 class Renderer_GL : public RendererInterface {
@@ -147,9 +126,7 @@ public:
 	Renderer_Vulk();
 	virtual ~Renderer_Vulk();
 	virtual void Init()  override; // intializes SDL windowing
-#ifdef USING_VULKAN
 	virtual void Input(SDL_KeyCode sdlKey) const override;
-#endif
 	virtual void Render() const override;
 	virtual void Update() override;
 	virtual void OpenWindow() const override;
@@ -172,11 +149,10 @@ public:
 
 	void ToggleShaderPipeline();
 
-#ifdef USING_VULKAN
 	VkDevice GetDevice() const;
-#endif
+
 private:
-#ifdef USING_VULKAN
+
 	mutable struct SDL_Window* m_window;
 	mutable bool m_isInitialized;
 	mutable bool m_updateShader; 
@@ -219,7 +195,6 @@ private:
 
 	// Cleanup
 	std::shared_ptr<DeletionQueue> m_mainDeletionQueue;
-#endif
 };
 
 class Renderer_DX : public RendererInterface {

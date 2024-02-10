@@ -4,20 +4,103 @@
 #include <cstring>
 
 #include <SDL2/SDL.h>
-#ifdef USING_VULKAN
+
 #include <SDL_vulkan.h>
 #include "VkBootstrap.h"
 #include "VulkanUtil.hpp"
 #include "PipelineBuilder.hpp"
 
-#endif
-// =================================== RENDERER_SDL ===================================
-//Renderer_SDL::Renderer_SDL()
-//{
-//	// open a window
-//
-//}
 
+// =================================== RENDERER_SDL ===================================
+Renderer_SDL::Renderer_SDL() :
+	m_window(nullptr, SDL_DestroyWindow),
+	m_renderer(nullptr, SDL_DestroyRenderer),
+	m_initSuccess(false)
+{
+	Init(); 
+
+	SDL_Window* pWindow = SDL_CreateWindow("SDL Renderer",
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		Renderer::WindowWidth,
+		Renderer::WindowHeight,
+		SDL_WINDOW_RESIZABLE);
+	if (!pWindow)
+	{
+		std::cout << "Failed to create SDL Window: " << SDL_GetError() << std::endl;
+		throw std::runtime_error(SDL_GetError());
+	}
+
+	m_window.reset(pWindow); // transfers ownership to the unique ptr, with custom deletion ** Notes.md 1.1 **
+
+	SDL_Renderer* pRenderer = SDL_CreateRenderer(m_window.get(), -1, 0);
+	if (!pRenderer)
+	{
+		std::cout << "Failed to Created SDL Renderer: " << SDL_GetError() << std::endl;
+		throw std::runtime_error(SDL_GetError());
+	}
+	m_renderer.reset(pRenderer);
+
+	SDL_SetRenderDrawBlendMode(m_renderer.get(), SDL_BLENDMODE_BLEND);
+
+
+	m_initSuccess = true;
+}
+
+Renderer_SDL::~Renderer_SDL()
+{
+	std::cout << "SDL Renderer Destroyed" << std::endl;
+}
+
+bool Renderer_SDL::InitSuccess() const
+{
+	return m_initSuccess;
+}
+
+void Renderer_SDL::Init() 
+{
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+		std::cerr << "SDL Could not be initialized: " << SDL_GetError() << std::endl;
+}
+
+void Renderer_SDL::Input(SDL_KeyCode) const
+{
+	// capture input
+}
+
+void Renderer_SDL::Update() 
+{
+	// process input
+}
+
+void Renderer_SDL::Render() const
+{
+	// clear screen
+	SDL_SetRenderDrawColor(m_renderer.get(), 0x21, 0xAE, 0xE9, 0x55);
+	SDL_RenderClear(m_renderer.get());
+	
+	// Set the drawing color to red
+	SDL_SetRenderDrawColor(m_renderer.get(), 255, 0, 0, 100); // RGBA for red
+	// Define a rectangle to fill
+	SDL_Rect rect1 = { 50, 50, 200, 150 };
+	// Fill the rectangle with the current drawing color (red)
+	SDL_RenderFillRect(m_renderer.get(), &rect1);
+
+	// Change the drawing color to blue
+	SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 255, 255); // RGBA for blue
+	// Define another rectangle to fill
+	SDL_Rect rect2 = { 300, 50, 200, 150 };
+	// Fill the second rectangle with the current drawing color (blue)
+	SDL_RenderFillRect(m_renderer.get(), &rect2);
+
+	// Present the renderer contents to the screen
+	SDL_RenderPresent(m_renderer.get());
+
+
+	// update screen
+	SDL_RenderPresent(m_renderer.get());
+
+}
 
 // =================================== RENDERER_OPEN_GL ===================================
 #ifdef USING_GL
@@ -296,7 +379,7 @@ bool Renderer_GL::InitSuccess() const
 }
 
 #endif
-#ifdef USING_VULKAN
+
 // =================================== RENDERER_VULKAN ===================================
 
 Renderer_Vulk::Renderer_Vulk() :
@@ -792,7 +875,7 @@ void Renderer_Vulk::ToggleShaderPipeline()
 
 	std::cout << "Changed to Pipeline Idx: " << m_activePipeline << std::endl;
 }
-#endif
+
 // =================================== RENDERER_DX3D ===================================
 
 Renderer_DX::Renderer_DX()
