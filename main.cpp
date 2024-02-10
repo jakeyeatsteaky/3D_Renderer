@@ -5,6 +5,10 @@
 	SDL Renderer
 
 		[ ] Start making some shapes
+		[ ] Dependency injection --> shapes register with app upon creation
+			- app has a vector of shapes
+			- app.render itrerates through this vector and calls renderer->drawShape(shape);
+
 
 		[ ] clean up vulkan shit that needs to build at the start
 
