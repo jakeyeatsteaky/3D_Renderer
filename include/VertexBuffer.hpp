@@ -1,5 +1,5 @@
-#ifndef VERTEX_BUFFER_H
-#define VERTEX_BUFFER_H
+#ifndef VERTEX_BUFFER_HPP
+#define VERTEX_BUFFER_HPP
 #include "GL/glew.h"
 #include <vector>
 
@@ -28,4 +28,4 @@ Some Notes:
 
 #endif
 
-#endif
+#endif 

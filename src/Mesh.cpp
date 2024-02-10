@@ -1,6 +1,6 @@
-#include "Mesh.h"
-#include "RendererAPI.h"
-#include "VertexBuffer.h"
+#include "Mesh.hpp"
+#include "RendererAPI.hpp"
+#include "VertexBuffer.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -47,7 +47,7 @@ Mesh::Mesh(	std::weak_ptr<VertexBuffer> vertexBuffer,
 
 	}
 	else {
-		std::shared_ptr<VertexBuffer> vbo = m_vbo.lock();
+		vbo = m_vbo.lock();
 		std::shared_ptr<VertexLayout> vlo = m_layout.lock();
 		if(vbo && vlo) { 
 			vbo->Bind();

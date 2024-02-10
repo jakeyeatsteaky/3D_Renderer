@@ -1,4 +1,4 @@
-#include "Texture.h"
+#include "Texture.hpp"
 #include <iostream>
 #include <cstring>
 #define GLEW_STATIC 

@@ -1,5 +1,5 @@
-#ifndef VERTEX_LAYOUT_H
-#define VERTEX_LAYOUT_H
+#ifndef VERTEX_LAYOUT_HPP
+#define VERTEX_LAYOUT_HPP
 #include <cstdlib>
 #include "enumerations.h"
 

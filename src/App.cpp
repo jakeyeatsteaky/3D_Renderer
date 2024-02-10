@@ -1,4 +1,4 @@
-#include "App.h"
+#include "App.hpp"
 #include <iostream>
 #include "SDL2/SDL.h"
 
@@ -10,7 +10,7 @@ class Renderer_DX;
 
 App::App() :
     m_isRunning(false),
-    m_rendererAPI(Renderer_API_Open_GL) 
+    m_rendererAPI(Renderer_API_Vulkan) 
 {
     if (m_rendererAPI == Renderer_API_Open_GL){
         std::cout << "YOU NEED TO WRITE THE SetupVertexLayouts function again because you accidentally deleted it :(\n";
@@ -50,6 +50,8 @@ void App::Input()
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                     m_isRunning = false;
+                if (event.key.keysym.sym == SDLK_SPACE)
+                    m_renderer->Input(SDLK_SPACE); 
                 break;
             case SDL_MOUSEWHEEL:
                 if (event.wheel.y > 0) 
@@ -75,6 +77,7 @@ void App::Render()
 void App::Destroy()
 {
     // Deallocate resources to subsystems 
+    m_renderer->Cleanup();
     std::cout << "App successfully destroyed\n";
 }
 

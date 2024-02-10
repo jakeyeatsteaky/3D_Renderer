@@ -1,5 +1,5 @@
-#ifndef RENDERER_INTERFACE_H
-#define RENDERER_INTERFACE_H
+#ifndef RENDERER_INTERFACE_HPP
+#define RENDERER_INTERFACE_HPP
 #include <cstddef>
 #include "enumerations.h"
 #include <iostream>
@@ -7,6 +7,8 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+
+#include <SDL.h>
 
 class Mesh;
 
@@ -17,8 +19,8 @@ public:
 
 	static std::unique_ptr<RendererInterface> MakeRenderer(RENDERER_API api);
 
-	virtual void Init() const = 0;
-	virtual void Input() const = 0;
+	virtual void Init() = 0;
+	virtual void Input(SDL_KeyCode sdlKey) const = 0;
 	virtual void Render() const = 0;
 	virtual void Update() = 0;
 	virtual void OpenWindow() const = 0;
@@ -28,6 +30,7 @@ public:
 	virtual bool InitSuccess() const = 0;
 	virtual void SetupVertexData() const = 0;
 	virtual void SetupVertexLayouts() const = 0;
+	virtual void Cleanup() = 0;
 
 private:
 	std::unordered_map<std::string, Mesh*> m_meshMap;

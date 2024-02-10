@@ -1,4 +1,4 @@
-#include "IndexBuffer.h"
+#include "IndexBuffer.hpp"
 #include <string>
 #include <cstring>
 

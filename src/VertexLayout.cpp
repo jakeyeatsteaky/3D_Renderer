@@ -1,4 +1,4 @@
-#include "VertexLayout.h"
+#include "VertexLayout.hpp"
 #include "GL/glew.h"
 
 void VertexLayout::SetLayout(size_t index, size_t size, size_t stride, size_t offset, bool intType)
