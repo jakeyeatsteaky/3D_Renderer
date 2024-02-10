@@ -2,30 +2,7 @@
 #include "enumerations.h"
 /////////////////// GLOBAL TODO ///////////////////
 #if 0
-
-1) [x] Update the VK_CHECK so that the checks called in the Draw() method do not spam print messages
-2) [ ] Look at making tha Draw() method a little tighter
-		[ ] Make some documentation on how that process works first and then clean it up
-3) [x] Finish the tut Chapter 2
-		[x] The render pipeline
-		[x] Setting up Trangle shaders
-		[x] Setting up render pipeline
-		[x] Passing data between shader stages
-		[x] Toggling shaders
-			[x] Did My Own Implementation
-			[x] As an exercise, add a third shader, and iterate through all three using spacebar
-			[x] Read the docs on vkguide just to see what he did (Section: Multiple Pipelines)
-		[x] cleanup and deletion queue
-4) [ ] Chapter 3
-		[ ] Vertex Buffers
-
-5) [ ] Implement the command pattern for updating game objects??
-
-
-NOTE FOR WHEN YOU COME BACK
-	Right now I am curious about how to handle the toggling of a shader.  SHould the updateShaderIdx function be called from App.Input?  Or should I append a command?
-
-	I would like to implement the command pattern here, and maybe even make it multithreaded.  Somewthing to think about.
+	SDL Renderer
 
 
 #endif
@@ -50,6 +27,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 }
 
 
+// TODO for OpenGL Renderer
 #if 0
 How this renderer works so I can quickly get up to speed for OpenGL
 
@@ -74,3 +52,32 @@ How this renderer works so I can quickly get up to speed for OpenGL
 		- when rendering you just need to bind the vertex array 
 #endif
 
+// TODO for Vulkan Renderer
+#if 0
+
+		1)[x] Update the VK_CHECK so that the checks called in the Draw() method do not spam print messages
+		2)[] Look at making tha Draw() method a little tighter
+		[] Make some documentation on how that process works first and then clean it up
+		3)[x] Finish the tut Chapter 2
+		[x] The render pipeline
+		[x] Setting up Trangle shaders
+		[x] Setting up render pipeline
+		[x] Passing data between shader stages
+		[x] Toggling shaders
+		[x] Did My Own Implementation
+		[x] As an exercise, add a third shader, and iterate through all three using spacebar
+		[x] Read the docs on vkguide just to see what he did(Section: Multiple Pipelines)
+		[x] cleanup and deletion queue
+		4)[] Chapter 3
+		[] Vertex Buffers
+
+		5)[] Implement the command pattern for updating game objects ? ?
+
+
+		NOTE FOR WHEN YOU COME BACK
+		Right now I am curious about how to handle the toggling of a shader.SHould the updateShaderIdx function be called from App.Input ? Or should I append a command ?
+
+		I would like to implement the command pattern here, and maybe even make it multithreaded.Somewthing to think about.
+
+
+#endif

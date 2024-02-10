@@ -14,9 +14,15 @@ std::unique_ptr<RendererInterface> RendererInterface::MakeRenderer(RENDERER_API 
     std::unique_ptr<RendererInterface> ret = nullptr;
     switch (api)
     {
-    case Renderer_Api_None:
+    case Renderer_API_None:
     {
         std::cout << "No Renderer API Selected\n";
+        break;
+    }
+    case Renderer_API_SDL:
+    {
+        ret = std::make_unique<Renderer_SDL>();
+        renderer = "SDL";
         break;
     }
     case Renderer_API_Open_GL:

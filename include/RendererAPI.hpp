@@ -1,19 +1,20 @@
 #ifndef RENDERER_API_HPP
 #define RENDERER_API_HPP
 
-#define USING_VULKAN
+//#define USING_GL
+//#define USING_VULKAN
 #include "RendererInterface.hpp"
 #include "DeletionQueue.hpp"
 
-#if defined(USING_GL)
 #define GLEW_STATIC
 #include "GL/glew.h"
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
-#elif defined(USING_VULKAN)
-#include <vulkan/vulkan.h>
 
-#else
+#if defined(USING_VULKAN)
+#include <vulkan/vulkan.h>
 #endif
+
 #include <memory>
 #include "enumerations.h"
 #include "Shaders.hpp"
@@ -55,6 +56,51 @@ namespace Renderer
 	constexpr const char* VULKAN_FRAG_SHADER_2 = "../shaders/binaries/frag3.spv";
 }
 
+class Renderer_SDL : public RendererInterface
+{
+public:
+	Renderer_SDL() :
+		m_window(nullptr),
+		m_renderer(nullptr)
+	{
+		SDL_Window* pWindow = SDL_CreateWindow("SDL Renderer",
+			SDL_WINDOWPOS_CENTERED,
+			SDL_WINDOWPOS_CENTERED,
+			Renderer::WindowWidth,
+			Renderer::WindowHeight,
+			SDL_WINDOW_RESIZABLE);
+		m_window = std::make_unique<SDL_Window>(pWindow);
+
+		SDL_Renderer* pRenderer = SDL_CreateRenderer(m_window.get(), -1, 0);
+		if (!pRenderer)
+		{
+			std::cout << "Failed to Created SDL Renderer: " << SDL_GetError() << std::endl;
+			throw SDL_GetError();
+		}
+		m_renderer = std::make_unique<SDL_Renderer>(pRenderer);
+
+		std::cout << "break" << std::endl;
+	}
+
+
+	virtual void Init()  override {}
+	virtual void Input(SDL_KeyCode) const override {}
+	virtual void Render() const override {}
+	virtual void Update() override {}
+	virtual void OpenWindow() const override {}
+	virtual void ClearScreen() const override {}
+	virtual void SetupShaders() const override {}
+	virtual void SetupTextures() const override {}
+	virtual bool InitSuccess() const override { return false; }
+	virtual void SetupVertexData() const override {}
+	virtual void SetupVertexLayouts() const override {}
+	void GeneratePrimitives() const {}
+	virtual void Cleanup() override {}
+
+private:
+	std::unique_ptr<SDL_Window> m_window;
+	std::unique_ptr<SDL_Renderer> m_renderer;
+};
 
 class Renderer_GL : public RendererInterface {
 public:
@@ -101,7 +147,9 @@ public:
 	Renderer_Vulk();
 	virtual ~Renderer_Vulk();
 	virtual void Init()  override; // intializes SDL windowing
+#ifdef USING_VULKAN
 	virtual void Input(SDL_KeyCode sdlKey) const override;
+#endif
 	virtual void Render() const override;
 	virtual void Update() override;
 	virtual void OpenWindow() const override;
@@ -124,9 +172,11 @@ public:
 
 	void ToggleShaderPipeline();
 
+#ifdef USING_VULKAN
 	VkDevice GetDevice() const;
-
+#endif
 private:
+#ifdef USING_VULKAN
 	mutable struct SDL_Window* m_window;
 	mutable bool m_isInitialized;
 	mutable bool m_updateShader; 
@@ -169,7 +219,7 @@ private:
 
 	// Cleanup
 	std::shared_ptr<DeletionQueue> m_mainDeletionQueue;
-
+#endif
 };
 
 class Renderer_DX : public RendererInterface {

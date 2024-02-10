@@ -11,6 +11,13 @@
 #include "PipelineBuilder.hpp"
 
 #endif
+// =================================== RENDERER_SDL ===================================
+//Renderer_SDL::Renderer_SDL()
+//{
+//	// open a window
+//
+//}
+
 
 // =================================== RENDERER_OPEN_GL ===================================
 #ifdef USING_GL
@@ -289,6 +296,7 @@ bool Renderer_GL::InitSuccess() const
 }
 
 #endif
+#ifdef USING_VULKAN
 // =================================== RENDERER_VULKAN ===================================
 
 Renderer_Vulk::Renderer_Vulk() :
@@ -784,7 +792,7 @@ void Renderer_Vulk::ToggleShaderPipeline()
 
 	std::cout << "Changed to Pipeline Idx: " << m_activePipeline << std::endl;
 }
-
+#endif
 // =================================== RENDERER_DX3D ===================================
 
 Renderer_DX::Renderer_DX()

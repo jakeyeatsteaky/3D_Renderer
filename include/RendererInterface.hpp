@@ -14,7 +14,7 @@ class Mesh;
 
 class RendererInterface {
 public:
-	RendererInterface() : m_activeAPI(Renderer_Api_None) {};
+	RendererInterface() : m_activeAPI(Renderer_API_None) {};
 	virtual ~RendererInterface();
 
 	static std::unique_ptr<RendererInterface> MakeRenderer(RENDERER_API api);

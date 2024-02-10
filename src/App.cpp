@@ -4,13 +4,14 @@
 
 #include <assert.h>
 
+class Renderer_SDL;
 class Renderer_GL;
 class Renderer_Vulk;
 class Renderer_DX;
 
 App::App() :
     m_isRunning(false),
-    m_rendererAPI(Renderer_API_Vulkan) 
+    m_rendererAPI(Renderer_API_SDL)
 {
     if (m_rendererAPI == Renderer_API_Open_GL){
         std::cout << "YOU NEED TO WRITE THE SetupVertexLayouts function again because you accidentally deleted it :(\n";
