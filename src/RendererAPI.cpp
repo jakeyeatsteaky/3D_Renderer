@@ -295,6 +295,7 @@ Renderer_Vulk::Renderer_Vulk() :
 	m_window(nullptr),
 	m_isInitialized(false),
 	m_updateShader(false),
+	m_frameNumber(0),
 	m_activePipeline(0)
 {
 	Init();
