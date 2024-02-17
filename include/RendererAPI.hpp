@@ -23,6 +23,7 @@
 #include "VertexLayout.hpp"
 #include "Mesh.hpp"
 #include "VulkShader.hpp"
+#include "Shape.hpp"
 
 
 namespace Renderer
@@ -73,6 +74,8 @@ public:
 	virtual void SetupVertexLayouts() const override {}
 	void GeneratePrimitives() const {}
 	virtual void Cleanup() override {}
+
+	void RenderShape(std::weak_ptr<Shape> shape) const;
 
 private:
 	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> m_window;

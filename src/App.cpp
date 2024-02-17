@@ -72,6 +72,7 @@ void App::Update()
 
 void App::Render()
 {
+    m_renderer->RenderShape(m_shapesList);
     m_renderer->Render();
 }
 

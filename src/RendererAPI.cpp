@@ -4,11 +4,11 @@
 #include <cstring>
 
 #include <SDL2/SDL.h>
-
 #include <SDL_vulkan.h>
 #include "VkBootstrap.h"
 #include "VulkanUtil.hpp"
 #include "PipelineBuilder.hpp"
+
 
 
 // =================================== RENDERER_SDL ===================================
@@ -73,28 +73,18 @@ void Renderer_SDL::Update()
 	// process input
 }
 
+void Renderer_SDL::RenderShape(std::weak_ptr<Shape> shape) const
+{
+	std::shared_ptr<Shape> lock = shape.lock();
+	lock->drawShape();
+
+}
+
 void Renderer_SDL::Render() const
 {
 	// clear screen
 	SDL_SetRenderDrawColor(m_renderer.get(), 0x21, 0xAE, 0xE9, 0x55);
 	SDL_RenderClear(m_renderer.get());
-	
-	// Set the drawing color to red
-	SDL_SetRenderDrawColor(m_renderer.get(), 255, 0, 0, 100); // RGBA for red
-	// Define a rectangle to fill
-	SDL_Rect rect1 = { 50, 50, 200, 150 };
-	// Fill the rectangle with the current drawing color (red)
-	SDL_RenderFillRect(m_renderer.get(), &rect1);
-
-	// Change the drawing color to blue
-	SDL_SetRenderDrawColor(m_renderer.get(), 0, 0, 255, 255); // RGBA for blue
-	// Define another rectangle to fill
-	SDL_Rect rect2 = { 300, 50, 200, 150 };
-	// Fill the second rectangle with the current drawing color (blue)
-	SDL_RenderFillRect(m_renderer.get(), &rect2);
-
-	// Present the renderer contents to the screen
-	SDL_RenderPresent(m_renderer.get());
 
 
 	// update screen
