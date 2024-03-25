@@ -130,7 +130,7 @@ private:
 	mutable struct SDL_Window* m_window;
 	mutable bool m_isInitialized;
 	mutable bool m_updateShader; 
-	mutable int m_frameNumber;
+	mutable uint32_t m_frameNumber;
 	VkExtent2D m_windowExtent{ 800, 600 };
 
 	// Core Init
